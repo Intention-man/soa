@@ -1,0 +1,826 @@
+openapi: 3.0.3
+info:
+  title: Route Management Service API
+  description: |
+    RESTful веб-сервис для управления коллекцией маршрутов.
+    
+    ## Основные возможности:
+    - CRUD операции над маршрутами
+    - Расширенная фильтрация и сортировка
+    - Постраничная навигация
+    - Аналитические операции над коллекцией
+    
+    ## Формат данных:
+    Все данные передаются в формате XML
+    
+    ## Валидация:
+    Сервис проверяет все ограничения целостности и возвращает соответствующие коды ошибок
+  version: 1.0.0
+  contact:
+    name: API Support
+    email: support@example.com
+
+servers:
+  - url: http://localhost:8080/api/v1
+    description: Локальный сервер разработки
+  - url: http://helios:8080/api/v1
+    description: Продуктивный сервер
+
+tags:
+  - name: Routes CRUD
+    description: Базовые операции с маршрутами (создание, чтение, обновление, удаление)
+  - name: Routes Analytics
+    description: Аналитические операции над коллекцией маршрутов
+
+paths:
+  /routes:
+    get:
+      tags:
+        - Routes CRUD
+      summary: Получить список маршрутов
+      description: |
+        Возвращает список маршрутов с поддержкой:
+        - **Фильтрации** по любым полям объекта
+        - **Сортировки** по одному или нескольким полям
+        - **Постраничного вывода** результатов
+        
+        ### Примеры использования:
+        - `/routes?page=0&size=10` - первая страница, 10 элементов
+        - `/routes?sort=distance,asc&sort=name,desc` - сортировка по distance по возрастанию, затем по name по убыванию
+        - `/routes?filter.distance.min=100&filter.distance.max=500` - маршруты с дистанцией от 100 до 500
+        - `/routes?filter.from.name=Москва&filter.to.name=Санкт-Петербург` - маршруты из Москвы в Санкт-Петербург
+      operationId: getRoutes
+      parameters:
+        # Параметры пагинации
+        - name: page
+          in: query
+          description: Номер страницы (нумерация начинается с 0)
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+          example: 0
+        - name: size
+          in: query
+          description: Количество элементов на странице
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+          example: 20
+
+        # Параметры сортировки
+        - name: sort
+          in: query
+          description: |
+            Параметры сортировки в формате: `field,direction`.
+            Можно указать несколько параметров для многоуровневой сортировки.
+            
+            **Доступные поля:**
+            - `id` - идентификатор
+            - `name` - название
+            - `distance` - дистанция
+            - `creationDate` - дата создания
+            - `coordinates.x` - координата X
+            - `coordinates.y` - координата Y
+            - `from.x` - X начальной точки
+            - `from.y` - Y начальной точки
+            - `from.name` - название начальной точки
+            - `to.x` - X конечной точки
+            - `to.y` - Y конечной точки
+            - `to.name` - название конечной точки
+            
+            **Направления:**
+            - `asc` - по возрастанию
+            - `desc` - по убыванию
+          style: form
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+              pattern: '^[a-zA-Z.]+,(asc|desc)$'
+          examples:
+            single:
+              summary: Одиночная сортировка
+              value: ["distance,asc"]
+            multiple:
+              summary: Множественная сортировка
+              value: ["distance,asc", "name,desc"]
+
+        # Параметры фильтрации
+        - name: filter.id
+          in: query
+          description: Фильтр по точному значению ID
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+          example: 42
+
+        - name: filter.name
+          in: query
+          description: Фильтр по названию (поиск подстроки, регистронезависимый)
+          schema:
+            type: string
+            minLength: 1
+          example: "Москва"
+
+        - name: filter.distance.min
+          in: query
+          description: Минимальная дистанция (включительно)
+          schema:
+            type: number
+            format: double
+            minimum: 1.01
+          example: 100.0
+
+        - name: filter.distance.max
+          in: query
+          description: Максимальная дистанция (включительно)
+          schema:
+            type: number
+            format: double
+          example: 1000.0
+
+        - name: filter.distance.equals
+          in: query
+          description: Точное значение дистанции
+          schema:
+            type: number
+            format: double
+            minimum: 1.01
+          example: 500.0
+
+        - name: filter.creationDate.from
+          in: query
+          description: Начальная дата создания (включительно)
+          schema:
+            type: string
+            format: date-time
+          example: "2024-01-01T00:00:00"
+
+        - name: filter.creationDate.to
+          in: query
+          description: Конечная дата создания (включительно)
+          schema:
+            type: string
+            format: date-time
+          example: "2024-12-31T23:59:59"
+
+        - name: filter.coordinates.x
+          in: query
+          description: Фильтр по координате X
+          schema:
+            type: integer
+          example: 100
+
+        - name: filter.coordinates.y
+          in: query
+          description: Фильтр по координате Y
+          schema:
+            type: integer
+            format: int64
+          example: 200
+
+        - name: filter.from.x
+          in: query
+          description: Фильтр по X координате начальной точки
+          schema:
+            type: integer
+          example: 55
+
+        - name: filter.from.y
+          in: query
+          description: Фильтр по Y координате начальной точки
+          schema:
+            type: integer
+            format: int64
+          example: 37
+
+        - name: filter.from.name
+          in: query
+          description: Фильтр по названию начальной точки (поиск подстроки)
+          schema:
+            type: string
+          example: "Москва"
+
+        - name: filter.to.x
+          in: query
+          description: Фильтр по X координате конечной точки
+          schema:
+            type: integer
+          example: 59
+
+        - name: filter.to.y
+          in: query
+          description: Фильтр по Y координате конечной точки
+          schema:
+            type: integer
+            format: int64
+          example: 30
+
+        - name: filter.to.name
+          in: query
+          description: Фильтр по названию конечной точки (поиск подстроки)
+          schema:
+            type: string
+          example: "Санкт-Петербург"
+
+      responses:
+        '200':
+          description: Успешное получение списка маршрутов
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/RouteListResponse'
+              example: |
+                <?xml version="1.0" encoding="UTF-8"?>
+                <RouteListResponse>
+                  <routes>
+                    <route>
+                      <id>1</id>
+                      <name>Маршрут Москва-СПб</name>
+                      <coordinates>
+                        <x>100</x>
+                        <y>200</y>
+                      </coordinates>
+                      <creationDate>2024-01-15T10:30:00</creationDate>
+                      <from>
+                        <x>55</x>
+                        <y>37</y>
+                        <name>Москва</name>
+                      </from>
+                      <to>
+                        <x>59</x>
+                        <y>30</y>
+                        <name>Санкт-Петербург</name>
+                      </to>
+                      <distance>650.5</distance>
+                    </route>
+                  </routes>
+                  <totalElements>100</totalElements>
+                  <totalPages>5</totalPages>
+                  <currentPage>0</currentPage>
+                  <pageSize>20</pageSize>
+                </RouteListResponse>
+
+        '400':
+          description: Некорректные параметры запроса
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example: |
+                <?xml version="1.0" encoding="UTF-8"?>
+                <ErrorResponse>
+                  <code>400</code>
+                  <message>Некорректные параметры запроса</message>
+                  <timestamp>2024-01-15T10:30:00</timestamp>
+                  <details>
+                    <detail>Параметр 'size' должен быть от 1 до 100</detail>
+                    <detail>Неверный формат параметра сортировки</detail>
+                  </details>
+                </ErrorResponse>
+
+    post:
+      tags:
+        - Routes CRUD
+      summary: Создать новый маршрут
+      description: |
+        Создает новый маршрут в коллекции.
+        
+        **Автоматически генерируемые поля:**
+        - `id` - уникальный идентификатор
+        - `creationDate` - дата и время создания
+        
+        **Валидация:**
+        - `name` не может быть null или пустым
+        - `coordinates` не может быть null
+        - `from` не может быть null
+        - `to` не может быть null
+        - `distance` должна быть больше 1
+        - Все обязательные поля должны быть заполнены
+      operationId: createRoute
+      requestBody:
+        description: Данные нового маршрута
+        required: true
+        content:
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/RouteCreateRequest'
+            example: |
+              <?xml version="1.0" encoding="UTF-8"?>
+              <RouteCreateRequest>
+                <name>Новый маршрут</name>
+                <coordinates>
+                  <x>100</x>
+                  <y>200</y>
+                </coordinates>
+                <from>
+                  <x>55</x>
+                  <y>37</y>
+                  <name>Москва</name>
+                </from>
+                <to>
+                  <x>59</x>
+                  <y>30</y>
+                  <name>Санкт-Петербург</name>
+                </to>
+                <distance>650.5</distance>
+              </RouteCreateRequest>
+
+      responses:
+        '201':
+          description: Маршрут успешно создан
+          headers:
+            Location:
+              description: URL созданного ресурса
+              schema:
+                type: string
+              example: /routes/1
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Route'
+
+        '400':
+          description: |
+            Невалидные данные. Возможные причины:
+            - Отсутствуют обязательные поля
+            - name пустое или null
+            - distance меньше или равна 1
+            - Некорректная структура XML
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example: |
+                <?xml version="1.0" encoding="UTF-8"?>
+                <ErrorResponse>
+                  <code>400</code>
+                  <message>Ошибка валидации данных</message>
+                  <timestamp>2024-01-15T10:30:00</timestamp>
+                  <details>
+                    <detail>Поле 'name' не может быть пустым</detail>
+                    <detail>Значение поля 'distance' должно быть больше 1</detail>
+                  </details>
+                </ErrorResponse>
+
+  /routes/{id}:
+    get:
+      tags:
+        - Routes CRUD
+      summary: Получить маршрут по ID
+      description: Возвращает маршрут с указанным идентификатором
+      operationId: getRouteById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Уникальный идентификатор маршрута
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+          example: 1
+
+      responses:
+        '200':
+          description: Маршрут найден
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Route'
+
+        '400':
+          description: Некорректный формат ID
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+        '404':
+          description: Маршрут с указанным ID не найден
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example: |
+                <?xml version="1.0" encoding="UTF-8"?>
+                <ErrorResponse>
+                  <code>404</code>
+                  <message>Маршрут не найден</message>
+                  <timestamp>2024-01-15T10:30:00</timestamp>
+                  <details>
+                    <detail>Маршрут с ID=999 не существует</detail>
+                  </details>
+                </ErrorResponse>
+
+    put:
+      tags:
+        - Routes CRUD
+      summary: Обновить существующий маршрут
+      description: |
+        Полностью обновляет маршрут с указанным ID.
+        
+        **Важно:**
+        - Поля `id` и `creationDate` изменить нельзя
+        - Все обязательные поля должны быть указаны
+        - Применяются те же правила валидации, что и при создании
+      operationId: updateRoute
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Уникальный идентификатор маршрута
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+          example: 1
+
+      requestBody:
+        description: Обновленные данные маршрута
+        required: true
+        content:
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/RouteUpdateRequest'
+
+      responses:
+        '200':
+          description: Маршрут успешно обновлен
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Route'
+
+        '400':
+          description: |
+            Невалидные данные. Возможные причины:
+            - Нарушены ограничения целостности
+            - Некорректная структура данных
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+        '404':
+          description: Маршрут с указанным ID не найден
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    delete:
+      tags:
+        - Routes CRUD
+      summary: Удалить маршрут
+      description: Удаляет маршрут из коллекции по указанному ID
+      operationId: deleteRoute
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Уникальный идентификатор маршрута
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+          example: 1
+
+      responses:
+        '204':
+          description: Маршрут успешно удален (No Content)
+
+        '400':
+          description: Некорректный формат ID
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+        '404':
+          description: Маршрут с указанным ID не найден
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /routes/distance/sum:
+    get:
+      tags:
+        - Routes Analytics
+      summary: Рассчитать сумму всех дистанций
+      description: |
+        Вычисляет сумму значений поля `distance` для всех маршрутов в коллекции.
+        
+        Возвращает:
+        - Общую сумму дистанций
+        - Количество маршрутов в расчете
+        - Среднюю дистанцию
+      operationId: getDistanceSum
+      responses:
+        '200':
+          description: Расчет выполнен успешно
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/DistanceSumResponse'
+              example: |
+                <?xml version="1.0" encoding="UTF-8"?>
+                <DistanceSumResponse>
+                  <totalSum>15750.5</totalSum>
+                  <routeCount>25</routeCount>
+                  <averageDistance>630.02</averageDistance>
+                  <minDistance>150.5</minDistance>
+                  <maxDistance>1200.75</maxDistance>
+                </DistanceSumResponse>
+
+  /routes/distance/group:
+    get:
+      tags:
+        - Routes Analytics
+      summary: Группировка маршрутов по дистанции
+      description: |
+        Группирует все маршруты по значению поля `distance` и возвращает количество элементов в каждой группе.
+        
+        Результат отсортирован по значению дистанции по возрастанию.
+      operationId: groupByDistance
+      responses:
+        '200':
+          description: Группировка выполнена успешно
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/DistanceGroupResponse'
+              example: |
+                <?xml version="1.0" encoding="UTF-8"?>
+                <DistanceGroupResponse>
+                  <groups>
+                    <group>
+                      <distance>100.5</distance>
+                      <count>3</count>
+                      <percentage>12.5</percentage>
+                    </group>
+                    <group>
+                      <distance>250.0</distance>
+                      <count>5</count>
+                      <percentage>20.8</percentage>
+                    </group>
+                    <group>
+                      <distance>650.5</distance>
+                      <count>10</count>
+                      <percentage>41.7</percentage>
+                    </group>
+                  </groups>
+                  <totalGroups>5</totalGroups>
+                  <totalRoutes>24</totalRoutes>
+                </DistanceGroupResponse>
+
+  /routes/distance/greater-than:
+    get:
+      tags:
+        - Routes Analytics
+      summary: Найти маршруты с дистанцией больше заданной
+      description: |
+        Возвращает массив маршрутов, у которых значение поля `distance` строго больше указанного значения.
+        
+        Результат отсортирован по дистанции по возрастанию.
+      operationId: getRoutesWithDistanceGreaterThan
+      parameters:
+        - name: minDistance
+          in: query
+          required: true
+          description: |
+            Минимальное значение дистанции (не включительно).
+            Будут возвращены маршруты с distance > minDistance
+          schema:
+            type: number
+            format: double
+            minimum: 1
+          example: 500.0
+
+      responses:
+        '200':
+          description: Маршруты найдены
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/FilteredRoutesResponse'
+              example: |
+                <?xml version="1.0" encoding="UTF-8"?>
+                <FilteredRoutesResponse>
+                  <routes>
+                    <route>
+                      <id>5</id>
+                      <name>Дальний маршрут</name>
+                      <coordinates>
+                        <x>150</x>
+                        <y>250</y>
+                      </coordinates>
+                      <creationDate>2024-01-20T14:30:00</creationDate>
+                      <from>
+                        <x>55</x>
+                        <y>37</y>
+                        <name>Москва</name>
+                      </from>
+                      <to>
+                        <x>104</x>
+                        <y>52</y>
+                        <name>Иркутск</name>
+                      </to>
+                      <distance>5042.0</distance>
+                    </route>
+                  </routes>
+                  <count>15</count>
+                  <minDistance>501.0</minDistance>
+                  <maxDistance>5042.0</maxDistance>
+                  <averageDistance>2150.5</averageDistance>
+                </FilteredRoutesResponse>
+
+        '400':
+          description: |
+            Некорректное значение параметра. Возможные причины:
+            - minDistance не указан
+            - minDistance меньше или равен 1
+            - Некорректный формат числа
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+schemas:
+  Route:
+    type: object
+    xml:
+      name: route
+    description: Полная модель маршрута
+    required:
+      - id
+      - name
+      - coordinates
+      - creationDate
+      - from
+      - to
+      - distance
+    properties:
+      id:
+        type: integer
+        format: int64
+        description: |
+          Уникальный идентификатор маршрута.
+          Генерируется автоматически при создании.
+          Не может быть null, должен быть больше 0.
+        minimum: 1
+        example: 1
+      name:
+        type: string
+        description: Название маршрута. Не может быть null или пустой строкой.
+        minLength: 1
+        maxLength: 255
+        example: "Маршрут Москва-Санкт-Петербург"
+      coordinates:
+        $ref: '#/components/schemas/Coordinates'
+        description: Координаты маршрута. Не могут быть null.
+      creationDate:
+        type: string
+        format: date-time
+        description: |
+          Дата и время создания маршрута (LocalDateTime).
+          Генерируется автоматически при создании.
+          Не может быть null.
+        example: "2024-01-15T10:30:00"
+      from:
+        $ref: '#/components/schemas/Location'
+        description: Начальная локация. Не может быть null.
+      to:
+        $ref: '#/components/schemas/Location'
+        description: Конечная локация. Не может быть null.
+      distance:
+        type: number
+        format: double
+        description: Дистанция маршрута в километрах. Должна быть больше 1.
+        exclusiveMinimum: true
+        minimum: 1
+        example: 650.5
+
+  RouteCreateRequest:
+    type: object
+    xml:
+      name: RouteCreateRequest
+    description: Модель для создания нового маршрута (без id и creationDate)
+    required:
+      - name
+      - coordinates
+      - from
+      - to
+      - distance
+    properties:
+      name:
+        type: string
+        description: Название маршрута. Не может быть null или пустой строкой.
+        minLength: 1
+        maxLength: 255
+        example: "Новый маршрут"
+      coordinates:
+        $ref: '#/components/schemas/Coordinates'
+      from:
+        $ref: '#/components/schemas/Location'
+      to:
+        $ref: '#/components/schemas/Location'
+      distance:
+        type: number
+        format: double
+        description: Дистанция маршрута в километрах. Должна быть больше 1.
+        exclusiveMinimum: true
+        minimum: 1
+        example: 650.5
+
+  RouteUpdateRequest:
+    type: object
+    xml:
+      name: RouteUpdateRequest
+    description: Модель для обновления существующего маршрута
+    required:
+      - name
+      - coordinates
+      - from
+      - to
+      - distance
+    properties:
+      name:
+        type: string
+        description: Название маршрута. Не может быть null или пустой строкой.
+        minLength: 1
+        maxLength: 255
+        example: "Обновленный маршрут"
+      coordinates:
+        $ref: '#/components/schemas/Coordinates'
+      from:
+        $ref: '#/components/schemas/Location'
+      to:
+        $ref: '#/components/schemas/Location'
+      distance:
+        type: number
+        format: double
+        description: Дистанция маршрута в километрах. Должна быть больше 1.
+        exclusiveMinimum: true
+        minimum: 1
+        example: 750.0
+
+  Coordinates:
+    type: object
+    xml:
+      name: coordinates
+    description: Координаты маршрута
+    required:
+      - x
+      - y
+    properties:
+      x:
+        type: integer
+        format: int32
+        description: Координата X (тип int)
+        example: 100
+      y:
+        type: integer
+        format: int64
+        description: Координата Y (тип Long, не может быть null)
+        example: 200
+
+  Location:
+    type: object
+    xml:
+      name: location
+    description: Описание локации (начальной или конечной точки маршрута)
+    required:
+      - x
+      - y
+      - name
+    properties:
+      x:
+        type: integer
+        format: int32
+        description: Координата X локации (тип Integer, не может быть null)
+        example: 55
+      y:
+        type: integer
+        format: int64
+        description: Координата Y локации (тип long)
+        example: 37
+      name:
+        type: string
+        description: Название локации (не может быть null)
+        minLength: 1
+        maxLength: 255
+        example: "Москва"
+
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic
+      description: Базовая HTTP аутентификация (опционально)

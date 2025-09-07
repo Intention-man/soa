@@ -1,0 +1,746 @@
+openapi: 3.0.3
+info:
+  title: Navigator Service API
+  description: |
+    Навигационный веб-сервис для расширенных операций с маршрутами.
+    
+    ## Описание сервиса:
+    Данный сервис предоставляет дополнительную функциональность для работы с маршрутами,
+    используя API первого сервиса управления маршрутами.
+    
+    ## Основные возможности:
+    - Поиск маршрутов между указанными локациями с сортировкой
+    - Добавление новых маршрутов между существующими локациями
+    
+    ## Взаимодействие с первым сервисом:
+    Navigator Service выполняет вызовы к Route Management Service для получения и создания данных.
+    
+    ## Формат данных:
+    Все данные передаются в формате XML
+  version: 1.0.0
+  contact:
+    name: Navigator API Support
+    email: navigator-support@example.com
+
+servers:
+  - url: http://localhost:8080/navigator
+    description: Локальный сервер разработки
+  - url: http://helios:8080/navigator
+    description: Продуктивный сервер
+
+tags:
+  - name: Navigation
+    description: Операции навигации и поиска маршрутов между локациями
+  - name: Route Management
+    description: Операции управления маршрутами через навигационный сервис
+
+paths:
+  /routes/{id-from}/{id-to}/{order-by}:
+    get:
+      tags:
+        - Navigation
+      summary: Найти маршруты между локациями
+      description: |
+        Выполняет поиск всех существующих маршрутов между двумя указанными локациями
+        и возвращает отсортированный список результатов.
+        
+        ## Алгоритм работы:
+        1. Получает все маршруты из первого сервиса
+        2. Фильтрует маршруты, где:
+           - `from` соответствует локации с `id-from`
+           - `to` соответствует локации с `id-to`
+        3. Сортирует результаты по указанному параметру
+        4. Возвращает отфильтрованный и отсортированный список
+        
+        ## Идентификация локаций:
+        Локации идентифицируются по уникальному ID, который должен существовать
+        в системе первого сервиса.
+        
+        ## Параметры сортировки:
+        - `distance` - сортировка по дистанции (по возрастанию)
+        - `name` - сортировка по названию маршрута (по алфавиту)
+        - `creationDate` - сортировка по дате создания (от старых к новым)
+        
+        ## Примеры использования:
+        - `/routes/1/2/distance` - маршруты от локации 1 к локации 2, отсортированные по дистанции
+        - `/routes/100/200/name` - маршруты от локации 100 к локации 200, отсортированные по названию
+      operationId: findRoutesBetweenLocations
+      parameters:
+        - name: id-from
+          in: path
+          required: true
+          description: |
+            Идентификатор начальной локации.
+            Должен соответствовать существующей локации в системе.
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+          example: 1
+
+        - name: id-to
+          in: path
+          required: true
+          description: |
+            Идентификатор конечной локации.
+            Должен соответствовать существующей локации в системе.
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+          example: 2
+
+        - name: order-by
+          in: path
+          required: true
+          description: |
+            Параметр сортировки результатов.
+            
+            Допустимые значения:
+            - `distance` - сортировка по дистанции маршрута (по возрастанию)
+            - `name` - сортировка по названию маршрута (в алфавитном порядке)
+            - `creationDate` - сортировка по дате создания (от старых к новым)
+          schema:
+            type: string
+            enum: [distance, name, creationDate]
+          example: distance
+
+      responses:
+        '200':
+          description: |
+            Маршруты успешно найдены и отсортированы.
+            Возвращается даже если найдено 0 маршрутов.
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/NavigatorRoutesResponse'
+              examples:
+                withRoutes:
+                  summary: Найдены маршруты
+                  value: |
+                    <?xml version="1.0" encoding="UTF-8"?>
+                    <NavigatorRoutesResponse>
+                      <routes>
+                        <route>
+                          <id>5</id>
+                          <name>Экспресс маршрут</name>
+                          <coordinates>
+                            <x>100</x>
+                            <y>200</y>
+                          </coordinates>
+                          <creationDate>2024-01-10T09:00:00</creationDate>
+                          <from>
+                            <x>55</x>
+                            <y>37</y>
+                            <name>Москва</name>
+                          </from>
+                          <to>
+                            <x>59</x>
+                            <y>30</y>
+                            <name>Санкт-Петербург</name>
+                          </to>
+                          <distance>650.5</distance>
+                        </route>
+                        <route>
+                          <id>12</id>
+                          <name>Стандартный маршрут</name>
+                          <coordinates>
+                            <x>110</x>
+                            <y>210</y>
+                          </coordinates>
+                          <creationDate>2024-01-15T14:30:00</creationDate>
+                          <from>
+                            <x>55</x>
+                            <y>37</y>
+                            <name>Москва</name>
+                          </from>
+                          <to>
+                            <x>59</x>
+                            <y>30</y>
+                            <name>Санкт-Петербург</name>
+                          </to>
+                          <distance>680.0</distance>
+                        </route>
+                      </routes>
+                      <fromLocationId>1</fromLocationId>
+                      <toLocationId>2</toLocationId>
+                      <sortedBy>distance</sortedBy>
+                      <totalFound>2</totalFound>
+                      <searchTimestamp>2024-01-20T10:30:00</searchTimestamp>
+                    </NavigatorRoutesResponse>
+
+                emptyResult:
+                  summary: Маршруты не найдены
+                  value: |
+                    <?xml version="1.0" encoding="UTF-8"?>
+                    <NavigatorRoutesResponse>
+                      <routes/>
+                      <fromLocationId>1</fromLocationId>
+                      <toLocationId>2</toLocationId>
+                      <sortedBy>distance</sortedBy>
+                      <totalFound>0</totalFound>
+                      <searchTimestamp>2024-01-20T10:30:00</searchTimestamp>
+                    </NavigatorRoutesResponse>
+
+        '400':
+          description: |
+            Некорректные параметры запроса.
+            
+            Возможные причины:
+            - Некорректный формат id-from или id-to (не число)
+            - Недопустимое значение параметра order-by
+            - id-from или id-to меньше 1
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example: |
+                <?xml version="1.0" encoding="UTF-8"?>
+                <ErrorResponse>
+                  <code>400</code>
+                  <message>Некорректные параметры запроса</message>
+                  <timestamp>2024-01-20T10:30:00</timestamp>
+                  <path>/navigator/routes/1/2/invalid</path>
+                  <details>
+                    <detail>Недопустимое значение параметра order-by: 'invalid'. Допустимые значения: distance, name, creationDate</detail>
+                  </details>
+                </ErrorResponse>
+
+        '404':
+          description: |
+            Одна или обе локации не найдены в системе.
+            
+            Возвращается когда:
+            - Локация с id-from не существует
+            - Локация с id-to не существует
+            - Обе локации не существуют
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example: |
+                <?xml version="1.0" encoding="UTF-8"?>
+                <ErrorResponse>
+                  <code>404</code>
+                  <message>Локация не найдена</message>
+                  <timestamp>2024-01-20T10:30:00</timestamp>
+                  <path>/navigator/routes/999/1000/distance</path>
+                  <details>
+                    <detail>Локация с ID=999 не найдена</detail>
+                    <detail>Локация с ID=1000 не найдена</detail>
+                  </details>
+                </ErrorResponse>
+
+        '500':
+          description: |
+            Внутренняя ошибка сервера.
+            
+            Возможные причины:
+            - Недоступен первый сервис
+            - Ошибка при обработке данных
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example: |
+                <?xml version="1.0" encoding="UTF-8"?>
+                <ErrorResponse>
+                  <code>500</code>
+                  <message>Внутренняя ошибка сервера</message>
+                  <timestamp>2024-01-20T10:30:00</timestamp>
+                  <path>/navigator/routes/1/2/distance</path>
+                  <details>
+                    <detail>Не удалось подключиться к сервису управления маршрутами</detail>
+                  </details>
+                </ErrorResponse>
+
+  /route/add/{id-from}/{id-to}/{distance}:
+    post:
+      tags:
+        - Route Management
+      summary: Добавить новый маршрут между локациями
+      description: |
+        Создает новый маршрут между двумя существующими локациями с указанной дистанцией.
+        
+        ## Алгоритм работы:
+        1. Проверяет существование локаций с указанными ID в первом сервисе
+        2. Получает полную информацию о локациях (координаты, названия)
+        3. Автоматически генерирует название маршрута на основе названий локаций
+        4. Создает координаты маршрута (например, середина между локациями)
+        5. Вызывает API первого сервиса для создания нового маршрута
+        6. Возвращает созданный маршрут
+        
+        ## Автоматическая генерация данных:
+        - **Название маршрута**: формируется как "Маршрут [название from] - [название to]"
+        - **Координаты маршрута**: вычисляются как средняя точка между локациями
+        - **ID и creationDate**: генерируются первым сервисом автоматически
+        
+        ## Валидация:
+        - Обе локации должны существовать в системе
+        - Дистанция должна быть больше 1
+        - Локации не должны совпадать (id-from ≠ id-to)
+        
+        ## Примеры использования:
+        - `/route/add/1/2/650.5` - создать маршрут от локации 1 к локации 2 с дистанцией 650.5 км
+        - `/route/add/10/20/1500.0` - создать маршрут от локации 10 к локации 20 с дистанцией 1500 км
+      operationId: addRouteBetweenLocations
+      parameters:
+        - name: id-from
+          in: path
+          required: true
+          description: |
+            Идентификатор начальной локации.
+            Должен соответствовать существующей локации в системе.
+            Не должен совпадать с id-to.
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+          example: 1
+
+        - name: id-to
+          in: path
+          required: true
+          description: |
+            Идентификатор конечной локации.
+            Должен соответствовать существующей локации в системе.
+            Не должен совпадать с id-from.
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+          example: 2
+
+        - name: distance
+          in: path
+          required: true
+          description: |
+            Дистанция маршрута в километрах.
+            Должна быть строго больше 1.
+          schema:
+            type: number
+            format: double
+            minimum: 1.01
+          example: 650.5
+
+      responses:
+        '201':
+          description: Маршрут успешно создан
+          headers:
+            Location:
+              description: URL созданного маршрута в первом сервисе
+              schema:
+                type: string
+              example: /routes/25
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/RouteCreatedResponse'
+              example: |
+                <?xml version="1.0" encoding="UTF-8"?>
+                <RouteCreatedResponse>
+                  <route>
+                    <id>25</id>
+                    <name>Маршрут Москва - Санкт-Петербург</name>
+                    <coordinates>
+                      <x>57</x>
+                      <y>33</y>
+                    </coordinates>
+                    <creationDate>2024-01-20T10:35:00</creationDate>
+                    <from>
+                      <x>55</x>
+                      <y>37</y>
+                      <name>Москва</name>
+                    </from>
+                    <to>
+                      <x>59</x>
+                      <y>30</y>
+                      <name>Санкт-Петербург</name>
+                    </to>
+                    <distance>650.5</distance>
+                  </route>
+                  <message>Маршрут успешно создан</message>
+                  <createdBy>navigator-service</createdBy>
+                </RouteCreatedResponse>
+
+        '400':
+          description: |
+            Некорректные параметры запроса.
+            
+            Возможные причины:
+            - distance меньше или равна 1
+            - id-from равен id-to
+            - Некорректный формат параметров
+            - Отрицательные значения ID
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                invalidDistance:
+                  summary: Некорректная дистанция
+                  value: |
+                    <?xml version="1.0" encoding="UTF-8"?>
+                    <ErrorResponse>
+                      <code>400</code>
+                      <message>Некорректное значение дистанции</message>
+                      <timestamp>2024-01-20T10:30:00</timestamp>
+                      <path>/navigator/route/add/1/2/0.5</path>
+                      <details>
+                        <detail>Значение дистанции должно быть больше 1, получено: 0.5</detail>
+                      </details>
+                    </ErrorResponse>
+
+                sameLocations:
+                  summary: Одинаковые локации
+                  value: |
+                    <?xml version="1.0" encoding="UTF-8"?>
+                    <ErrorResponse>
+                      <code>400</code>
+                      <message>Некорректные параметры маршрута</message>
+                      <timestamp>2024-01-20T10:30:00</timestamp>
+                      <path>/navigator/route/add/5/5/100.0</path>
+                      <details>
+                        <detail>Начальная и конечная локации не могут совпадать</detail>
+                      </details>
+                    </ErrorResponse>
+
+        '404':
+          description: |
+            Одна или обе локации не найдены в системе.
+            
+            Сервис проверяет существование локаций перед созданием маршрута.
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                fromNotFound:
+                  summary: Начальная локация не найдена
+                  value: |
+                    <?xml version="1.0" encoding="UTF-8"?>
+                    <ErrorResponse>
+                      <code>404</code>
+                      <message>Локация не найдена</message>
+                      <timestamp>2024-01-20T10:30:00</timestamp>
+                      <path>/navigator/route/add/999/2/500.0</path>
+                      <details>
+                        <detail>Начальная локация с ID=999 не найдена в системе</detail>
+                      </details>
+                    </ErrorResponse>
+
+                bothNotFound:
+                  summary: Обе локации не найдены
+                  value: |
+                    <?xml version="1.0" encoding="UTF-8"?>
+                    <ErrorResponse>
+                      <code>404</code>
+                      <message>Локации не найдены</message>
+                      <timestamp>2024-01-20T10:30:00</timestamp>
+                      <path>/navigator/route/add/999/1000/500.0</path>
+                      <details>
+                        <detail>Начальная локация с ID=999 не найдена в системе</detail>
+                        <detail>Конечная локация с ID=1000 не найдена в системе</detail>
+                      </details>
+                    </ErrorResponse>
+
+        '409':
+          description: |
+            Конфликт при создании маршрута.
+            
+            Возможные причины:
+            - Маршрут с такими же параметрами уже существует
+            - Превышен лимит маршрутов между данными локациями
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example: |
+                <?xml version="1.0" encoding="UTF-8"?>
+                <ErrorResponse>
+                  <code>409</code>
+                  <message>Конфликт при создании маршрута</message>
+                  <timestamp>2024-01-20T10:30:00</timestamp>
+                  <path>/navigator/route/add/1/2/650.5</path>
+                  <details>
+                    <detail>Маршрут между локациями 1 и 2 с дистанцией 650.5 уже существует</detail>
+                  </details>
+                </ErrorResponse>
+
+        '500':
+          description: |
+            Внутренняя ошибка сервера.
+            
+            Возможные причины:
+            - Недоступен первый сервис
+            - Ошибка при создании маршрута в первом сервисе
+            - Непредвиденная ошибка обработки
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example: |
+                <?xml version="1.0" encoding="UTF-8"?>
+                <ErrorResponse>
+                  <code>500</code>
+                  <message>Внутренняя ошибка сервера</message>
+                  <timestamp>2024-01-20T10:30:00</timestamp>
+                  <path>/navigator/route/add/1/2/650.5</path>
+                  <details>
+                    <detail>Не удалось создать маршрут: сервис управления маршрутами недоступен</detail>
+                  </details>
+                </ErrorResponse>
+
+components:
+  schemas:
+    Route:
+      type: object
+      xml:
+        name: route
+      description: Модель маршрута (идентична модели из первого сервиса)
+      required:
+        - id
+        - name
+        - coordinates
+        - creationDate
+        - from
+        - to
+        - distance
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Уникальный идентификатор маршрута
+          minimum: 1
+          example: 25
+        name:
+          type: string
+          description: Название маршрута
+          minLength: 1
+          maxLength: 255
+          example: "Маршрут Москва - Санкт-Петербург"
+        coordinates:
+          $ref: '#/components/schemas/Coordinates'
+        creationDate:
+          type: string
+          format: date-time
+          description: Дата и время создания маршрута
+          example: "2024-01-20T10:35:00"
+        from:
+          $ref: '#/components/schemas/Location'
+        to:
+          $ref: '#/components/schemas/Location'
+        distance:
+          type: number
+          format: double
+          description: Дистанция маршрута в километрах
+          minimum: 1.01
+          example: 650.5
+
+    Coordinates:
+      type: object
+      xml:
+        name: coordinates
+      description: Координаты маршрута
+      required:
+        - x
+        - y
+      properties:
+        x:
+          type: integer
+          format: int32
+          description: Координата X
+          example: 57
+        y:
+          type: integer
+          format: int64
+          description: Координата Y
+          example: 33
+
+    Location:
+      type: object
+      xml:
+        name: location
+      description: Описание локации
+      required:
+        - x
+        - y
+        - name
+      properties:
+        x:
+          type: integer
+          format: int32
+          description: Координата X локации
+          example: 55
+        y:
+          type: integer
+          format: int64
+          description: Координата Y локации
+          example: 37
+        name:
+          type: string
+          description: Название локации
+          minLength: 1
+          maxLength: 255
+          example: "Москва"
+
+    NavigatorRoutesResponse:
+      type: object
+      xml:
+        name: NavigatorRoutesResponse
+      description: |
+        Ответ на запрос поиска маршрутов между локациями.
+        Содержит найденные маршруты и метаинформацию о поиске.
+      properties:
+        routes:
+          type: array
+          xml:
+            wrapped: false
+          items:
+            $ref: '#/components/schemas/Route'
+          description: Массив найденных маршрутов, отсортированный согласно параметру order-by
+        fromLocationId:
+          type: integer
+          format: int64
+          description: ID начальной локации из запроса
+          example: 1
+        toLocationId:
+          type: integer
+          format: int64
+          description: ID конечной локации из запроса
+          example: 2
+        sortedBy:
+          type: string
+          description: Параметр, по которому выполнена сортировка
+          enum: [distance, name, creationDate]
+          example: "distance"
+        totalFound:
+          type: integer
+          description: Общее количество найденных маршрутов
+          example: 5
+        searchTimestamp:
+          type: string
+          format: date-time
+          description: Время выполнения поиска
+          example: "2024-01-20T10:30:00"
+        statistics:
+          type: object
+          description: Статистика по найденным маршрутам (опционально)
+          properties:
+            minDistance:
+              type: number
+              format: double
+              description: Минимальная дистанция среди найденных маршрутов
+              example: 650.5
+            maxDistance:
+              type: number
+              format: double
+              description: Максимальная дистанция среди найденных маршрутов
+              example: 1200.0
+            averageDistance:
+              type: number
+              format: double
+              description: Средняя дистанция
+              example: 875.25
+
+    RouteCreatedResponse:
+      type: object
+      xml:
+        name: RouteCreatedResponse
+      description: |
+        Ответ на успешное создание маршрута.
+        Содержит созданный маршрут и дополнительную информацию.
+      properties:
+        route:
+          $ref: '#/components/schemas/Route'
+          description: Созданный маршрут с присвоенным ID
+        message:
+          type: string
+          description: Сообщение об успешном создании
+          example: "Маршрут успешно создан"
+        createdBy:
+          type: string
+          description: Идентификатор сервиса, создавшего маршрут
+          example: "navigator-service"
+        generatedName:
+          type: boolean
+          description: Флаг, указывающий, что название было сгенерировано автоматически
+          example: true
+        calculatedCoordinates:
+          type: boolean
+          description: Флаг, указывающий, что координаты были вычислены автоматически
+          example: true
+
+    ErrorResponse:
+      type: object
+      xml:
+        name: ErrorResponse
+      description: Модель ответа об ошибке
+      required:
+        - code
+        - message
+        - timestamp
+      properties:
+        code:
+          type: integer
+          description: HTTP код ошибки
+          example: 400
+        message:
+          type: string
+          description: Общее описание ошибки
+          example: "Некорректные параметры запроса"
+        timestamp:
+          type: string
+          format: date-time
+          description: Время возникновения ошибки
+          example: "2024-01-20T10:30:00"
+        path:
+          type: string
+          description: Путь запроса, вызвавшего ошибку
+          example: "/navigator/routes/1/2/invalid"
+        details:
+          type: array
+          xml:
+            wrapped: false
+          items:
+            type: string
+            xml:
+              name: detail
+          description: Детальная информация об ошибках
+          example:
+            - "Локация с ID=999 не найдена"
+            - "Значение дистанции должно быть больше 1"
+        errorId:
+          type: string
+          description: Уникальный идентификатор ошибки для отслеживания в логах
+          format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440000"
+
+  examples:
+    RouteExample:
+      summary: Пример маршрута
+      value:
+        id: 10
+        name: "Экспресс Москва-СПб"
+        coordinates:
+          x: 57
+          y: 33
+        creationDate: "2024-01-15T10:00:00"
+        from:
+          x: 55
+          y: 37
+          name: "Москва"
+        to:
+          x: 59
+          y: 30
+          name: "Санкт-Петербург"
+        distance: 635.0
+
+x-readme:
+  explorer-enabled: true
+  proxy-enabled: true
+  samples-languages:
+    - curl
+    - java
+    - python
+    - javascript
