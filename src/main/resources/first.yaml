@@ -653,174 +653,327 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
 
 components:
-schemas:
-  Route:
-    type: object
-    xml:
-      name: route
-    description: Полная модель маршрута
-    required:
-      - id
-      - name
-      - coordinates
-      - creationDate
-      - from
-      - to
-      - distance
-    properties:
-      id:
-        type: integer
-        format: int64
-        description: |
-          Уникальный идентификатор маршрута.
-          Генерируется автоматически при создании.
-          Не может быть null, должен быть больше 0.
-        minimum: 1
-        example: 1
-      name:
-        type: string
-        description: Название маршрута. Не может быть null или пустой строкой.
-        minLength: 1
-        maxLength: 255
-        example: "Маршрут Москва-Санкт-Петербург"
-      coordinates:
-        $ref: '#/components/schemas/Coordinates'
-        description: Координаты маршрута. Не могут быть null.
-      creationDate:
-        type: string
-        format: date-time
-        description: |
-          Дата и время создания маршрута (LocalDateTime).
-          Генерируется автоматически при создании.
-          Не может быть null.
-        example: "2024-01-15T10:30:00"
-      from:
-        $ref: '#/components/schemas/Location'
-        description: Начальная локация. Не может быть null.
-      to:
-        $ref: '#/components/schemas/Location'
-        description: Конечная локация. Не может быть null.
-      distance:
-        type: number
-        format: double
-        description: Дистанция маршрута в километрах. Должна быть больше 1.
-        exclusiveMinimum: true
-        minimum: 1
-        example: 650.5
+  schemas:
+    Route:
+      type: object
+      xml:
+        name: route
+      description: Полная модель маршрута
+      required:
+        - id
+        - name
+        - coordinates
+        - creationDate
+        - from
+        - to
+        - distance
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: |
+            Уникальный идентификатор маршрута.
+            Генерируется автоматически при создании.
+          minimum: 1
+          example: 1
+        name:
+          type: string
+          description: Название маршрута
+          minLength: 1
+          maxLength: 255
+          example: "Маршрут Москва-Санкт-Петербург"
+        coordinates:
+          $ref: '#/components/schemas/Coordinates'
+        creationDate:
+          type: string
+          format: date-time
+          description: |
+            Дата и время создания маршрута.
+            Генерируется автоматически при создании.
+          example: "2024-01-15T10:30:00"
+        from:
+          $ref: '#/components/schemas/Location'
+        to:
+          $ref: '#/components/schemas/Location'
+        distance:
+          type: number
+          format: double
+          description: Дистанция маршрута в километрах
+          minimum: 1.01
+          example: 650.5
 
-  RouteCreateRequest:
-    type: object
-    xml:
-      name: RouteCreateRequest
-    description: Модель для создания нового маршрута (без id и creationDate)
-    required:
-      - name
-      - coordinates
-      - from
-      - to
-      - distance
-    properties:
-      name:
-        type: string
-        description: Название маршрута. Не может быть null или пустой строкой.
-        minLength: 1
-        maxLength: 255
-        example: "Новый маршрут"
-      coordinates:
-        $ref: '#/components/schemas/Coordinates'
-      from:
-        $ref: '#/components/schemas/Location'
-      to:
-        $ref: '#/components/schemas/Location'
-      distance:
-        type: number
-        format: double
-        description: Дистанция маршрута в километрах. Должна быть больше 1.
-        exclusiveMinimum: true
-        minimum: 1
-        example: 650.5
+    RouteCreateRequest:
+      type: object
+      xml:
+        name: RouteCreateRequest
+      description: Модель для создания нового маршрута
+      required:
+        - name
+        - coordinates
+        - from
+        - to
+        - distance
+      properties:
+        name:
+          type: string
+          description: Название маршрута
+          minLength: 1
+          maxLength: 255
+          example: "Новый маршрут"
+        coordinates:
+          $ref: '#/components/schemas/Coordinates'
+        from:
+          $ref: '#/components/schemas/Location'
+        to:
+          $ref: '#/components/schemas/Location'
+        distance:
+          type: number
+          format: double
+          description: Дистанция маршрута в километрах
+          minimum: 1.01
+          example: 650.5
 
-  RouteUpdateRequest:
-    type: object
-    xml:
-      name: RouteUpdateRequest
-    description: Модель для обновления существующего маршрута
-    required:
-      - name
-      - coordinates
-      - from
-      - to
-      - distance
-    properties:
-      name:
-        type: string
-        description: Название маршрута. Не может быть null или пустой строкой.
-        minLength: 1
-        maxLength: 255
-        example: "Обновленный маршрут"
-      coordinates:
-        $ref: '#/components/schemas/Coordinates'
-      from:
-        $ref: '#/components/schemas/Location'
-      to:
-        $ref: '#/components/schemas/Location'
-      distance:
-        type: number
-        format: double
-        description: Дистанция маршрута в километрах. Должна быть больше 1.
-        exclusiveMinimum: true
-        minimum: 1
-        example: 750.0
+    RouteUpdateRequest:
+      type: object
+      xml:
+        name: RouteUpdateRequest
+      description: Модель для обновления существующего маршрута
+      required:
+        - name
+        - coordinates
+        - from
+        - to
+        - distance
+      properties:
+        name:
+          type: string
+          description: Название маршрута
+          minLength: 1
+          maxLength: 255
+          example: "Обновленный маршрут"
+        coordinates:
+          $ref: '#/components/schemas/Coordinates'
+        from:
+          $ref: '#/components/schemas/Location'
+        to:
+          $ref: '#/components/schemas/Location'
+        distance:
+          type: number
+          format: double
+          description: Дистанция маршрута в километрах
+          minimum: 1.01
+          example: 750.0
 
-  Coordinates:
-    type: object
-    xml:
-      name: coordinates
-    description: Координаты маршрута
-    required:
-      - x
-      - y
-    properties:
-      x:
-        type: integer
-        format: int32
-        description: Координата X (тип int)
-        example: 100
-      y:
-        type: integer
-        format: int64
-        description: Координата Y (тип Long, не может быть null)
-        example: 200
+    Coordinates:
+      type: object
+      xml:
+        name: coordinates
+      description: Координаты маршрута
+      required:
+        - x
+        - y
+      properties:
+        x:
+          type: integer
+          format: int32
+          description: Координата X
+          example: 100
+        y:
+          type: integer
+          format: int64
+          description: Координата Y (не может быть null)
+          example: 200
 
-  Location:
-    type: object
-    xml:
-      name: location
-    description: Описание локации (начальной или конечной точки маршрута)
-    required:
-      - x
-      - y
-      - name
-    properties:
-      x:
-        type: integer
-        format: int32
-        description: Координата X локации (тип Integer, не может быть null)
-        example: 55
-      y:
-        type: integer
-        format: int64
-        description: Координата Y локации (тип long)
-        example: 37
-      name:
-        type: string
-        description: Название локации (не может быть null)
-        minLength: 1
-        maxLength: 255
-        example: "Москва"
+    Location:
+      type: object
+      xml:
+        name: location
+      description: Описание локации (начальной или конечной точки маршрута)
+      required:
+        - x
+        - y
+        - name
+      properties:
+        x:
+          type: integer
+          format: int32
+          description: Координата X локации (не может быть null)
+          example: 55
+        y:
+          type: integer
+          format: int64
+          description: Координата Y локации
+          example: 37
+        name:
+          type: string
+          description: Название локации
+          minLength: 1
+          maxLength: 255
+          example: "Москва"
 
-  securitySchemes:
-    BasicAuth:
-      type: http
-      scheme: basic
-      description: Базовая HTTP аутентификация (опционально)
+    RouteListResponse:
+      type: object
+      xml:
+        name: RouteListResponse
+      description: Ответ со списком маршрутов и метаинформацией о пагинации
+      properties:
+        routes:
+          type: array
+          xml:
+            wrapped: false
+          items:
+            $ref: '#/components/schemas/Route'
+        totalElements:
+          type: integer
+          format: int64
+          description: Общее количество элементов
+          example: 100
+        totalPages:
+          type: integer
+          description: Общее количество страниц
+          example: 5
+        currentPage:
+          type: integer
+          description: Номер текущей страницы
+          example: 0
+        pageSize:
+          type: integer
+          description: Размер страницы
+          example: 20
+
+    DistanceSumResponse:
+      type: object
+      xml:
+        name: DistanceSumResponse
+      description: Результат расчета суммы дистанций
+      properties:
+        totalSum:
+          type: number
+          format: double
+          description: Общая сумма всех дистанций
+          example: 15750.5
+        routeCount:
+          type: integer
+          description: Количество маршрутов в расчете
+          example: 25
+        averageDistance:
+          type: number
+          format: double
+          description: Средняя дистанция
+          example: 630.02
+        minDistance:
+          type: number
+          format: double
+          description: Минимальная дистанция среди всех маршрутов
+          example: 150.5
+        maxDistance:
+          type: number
+          format: double
+          description: Максимальная дистанция среди всех маршрутов
+          example: 1200.75
+
+    DistanceGroupResponse:
+      type: object
+      xml:
+        name: DistanceGroupResponse
+      description: Результат группировки маршрутов по дистанции
+      properties:
+        groups:
+          type: array
+          xml:
+            wrapped: false
+          items:
+            type: object
+            xml:
+              name: group
+            properties:
+              distance:
+                type: number
+                format: double
+                description: Значение дистанции для группы
+                example: 650.5
+              count:
+                type: integer
+                description: Количество маршрутов в группе
+                example: 10
+              percentage:
+                type: number
+                format: double
+                description: Процент от общего количества маршрутов
+                example: 41.7
+        totalGroups:
+          type: integer
+          description: Общее количество групп
+          example: 5
+        totalRoutes:
+          type: integer
+          description: Общее количество маршрутов
+          example: 24
+
+    FilteredRoutesResponse:
+      type: object
+      xml:
+        name: FilteredRoutesResponse
+      description: Результат фильтрации маршрутов по дистанции
+      properties:
+        routes:
+          type: array
+          xml:
+            wrapped: false
+          items:
+            $ref: '#/components/schemas/Route'
+        count:
+          type: integer
+          description: Количество найденных маршрутов
+          example: 15
+        minDistance:
+          type: number
+          format: double
+          description: Минимальная дистанция среди найденных маршрутов
+          example: 501.0
+        maxDistance:
+          type: number
+          format: double
+          description: Максимальная дистанция среди найденных маршрутов
+          example: 5042.0
+        averageDistance:
+          type: number
+          format: double
+          description: Средняя дистанция среди найденных маршрутов
+          example: 2150.5
+
+    ErrorResponse:
+      type: object
+      xml:
+        name: ErrorResponse
+      description: Модель ответа об ошибке
+      properties:
+        code:
+          type: integer
+          description: HTTP код ошибки
+          example: 400
+        message:
+          type: string
+          description: Общее описание ошибки
+          example: "Ошибка валидации данных"
+        timestamp:
+          type: string
+          format: date-time
+          description: Время возникновения ошибки
+          example: "2024-01-15T10:30:00"
+        path:
+          type: string
+          description: Путь запроса, вызвавшего ошибку
+          example: "/routes/999"
+        details:
+          type: array
+          xml:
+            wrapped: false
+          items:
+            type: string
+            xml:
+              name: detail
+          description: Детальная информация об ошибках
+          example:
+            - "Поле 'name' не может быть пустым"
+            - "Значение поля 'distance' должно быть больше 1"
