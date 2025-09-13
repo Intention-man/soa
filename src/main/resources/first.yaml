@@ -48,7 +48,7 @@ paths:
         - `/routes?page=0&size=10` - первая страница, 10 элементов
         - `/routes?sort=distance,asc&sort=name,desc` - сортировка по distance по возрастанию, затем по name по убыванию
         - `/routes?filter.distance.min=100&filter.distance.max=500` - маршруты с дистанцией от 100 до 500
-        - `/routes?filter.from.name=Москва&filter.to.name=Санкт-Петербург` - маршруты из Москвы в Санкт-Петербург
+        - `/routes?filter.fromName=Москва&filter.toName=Санкт-Петербург` - маршруты из Москвы в Санкт-Петербург
       operationId: getRoutes
       parameters:
         # Параметры пагинации
@@ -82,14 +82,14 @@ paths:
             - `name` - название
             - `distance` - дистанция
             - `creationDate` - дата создания
-            - `coordinates.x` - координата X
-            - `coordinates.y` - координата Y
-            - `from.x` - X начальной точки
-            - `from.y` - Y начальной точки
-            - `from.name` - название начальной точки
-            - `to.x` - X конечной точки
-            - `to.y` - Y конечной точки
-            - `to.name` - название конечной точки
+            - `coordinatesX` - координата X
+            - `coordinatesY` - координата Y
+            - `fromX` - X начальной точки
+            - `fromY` - Y начальной точки
+            - `fromName` - название начальной точки
+            - `toX` - X конечной точки
+            - `toY` - Y конечной точки
+            - `toName` - название конечной точки
             
             **Направления:**
             - `asc` - по возрастанию
@@ -110,7 +110,9 @@ paths:
               value: ["distance,asc", "name,desc"]
 
         # Параметры фильтрации
-        - name: filter.id
+
+        # ID (Long, целое число)
+        - name: filter.id.equals
           in: query
           description: Фильтр по точному значению ID
           schema:
@@ -119,31 +121,60 @@ paths:
             minimum: 1
           example: 42
 
-        - name: filter.name
+        - name: filter.id.gt
           in: query
-          description: Фильтр по названию (поиск подстроки, регистронезависимый)
+          description: ID больше указанного значения (>)
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+          example: 10
+
+        - name: filter.id.gte
+          in: query
+          description: ID больше или равно указанному значению (≥)
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+          example: 10
+
+        - name: filter.id.lt
+          in: query
+          description: ID меньше указанного значения (<)
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+          example: 100
+
+        - name: filter.id.lte
+          in: query
+          description: ID меньше или равно указанному значению (≤)
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+          example: 100
+
+        # name (String)
+        - name: filter.name.equals
+          in: query
+          description: Точное совпадение по названию
           schema:
             type: string
             minLength: 1
           example: "Москва"
 
-        - name: filter.distance.min
+        - name: filter.name.contains
           in: query
-          description: Минимальная дистанция (включительно)
+          description: Поиск по подстроке в названии (регистронезависимый)
           schema:
-            type: number
-            format: double
-            minimum: 1.01
-          example: 100.0
+            type: string
+            minLength: 1
+          example: "Моск"
 
-        - name: filter.distance.max
-          in: query
-          description: Максимальная дистанция (включительно)
-          schema:
-            type: number
-            format: double
-          example: 1000.0
-
+        # distance (double)
         - name: filter.distance.equals
           in: query
           description: Точное значение дистанции
@@ -153,80 +184,347 @@ paths:
             minimum: 1.01
           example: 500.0
 
-        - name: filter.creationDate.from
+        - name: filter.distance.gt
           in: query
-          description: Начальная дата создания (включительно)
+          description: Дистанция больше указанного значения (>)
+          schema:
+            type: number
+            format: double
+            minimum: 1.01
+          example: 100.0
+
+        - name: filter.distance.gte
+          in: query
+          description: Дистанция больше или равна указанному значению (≥)
+          schema:
+            type: number
+            format: double
+            minimum: 1.01
+          example: 100.0
+
+        - name: filter.distance.lt
+          in: query
+          description: Дистанция меньше указанного значения (<)
+          schema:
+            type: number
+            format: double
+            minimum: 1.01
+          example: 1000.0
+
+        - name: filter.distance.lte
+          in: query
+          description: Дистанция меньше или равна указанному значению (≤)
+          schema:
+            type: number
+            format: double
+            minimum: 1.01
+          example: 1000.0
+
+        # creationDate (LocalDateTime, ISO 8601)
+        - name: filter.creationDate.equals
+          in: query
+          description: Точная дата создания
+          schema:
+            type: string
+            format: date-time
+          example: "2024-01-15T10:30:00"
+
+        - name: filter.creationDate.gt
+          in: query
+          description: Дата создания позже указанной (>)
           schema:
             type: string
             format: date-time
           example: "2024-01-01T00:00:00"
 
-        - name: filter.creationDate.to
+        - name: filter.creationDate.gte
           in: query
-          description: Конечная дата создания (включительно)
+          description: Дата создания позже или равна указанной (≥)
+          schema:
+            type: string
+            format: date-time
+          example: "2024-01-01T00:00:00"
+
+        - name: filter.creationDate.lt
+          in: query
+          description: Дата создания раньше указанной (<)
           schema:
             type: string
             format: date-time
           example: "2024-12-31T23:59:59"
 
-        - name: filter.coordinates.x
+        - name: filter.creationDate.lte
           in: query
-          description: Фильтр по координате X
+          description: Дата создания раньше или равна указанной (≤)
+          schema:
+            type: string
+            format: date-time
+          example: "2024-12-31T23:59:59"
+
+        # coordinates.x (int)
+        - name: filter.coordinatesX.equals
+          in: query
+          description: Координата X ровно равна
           schema:
             type: integer
           example: 100
 
-        - name: filter.coordinates.y
+        - name: filter.coordinatesX.gt
           in: query
-          description: Фильтр по координате Y
+          description: Координата X больше (>)
+          schema:
+            type: integer
+          example: 50
+
+        - name: filter.coordinatesX.gte
+          in: query
+          description: Координата X больше или равна (≥)
+          schema:
+            type: integer
+          example: 50
+
+        - name: filter.coordinatesX.lt
+          in: query
+          description: Координата X меньше (<)
+          schema:
+            type: integer
+          example: 150
+
+        - name: filter.coordinatesX.lte
+          in: query
+          description: Координата X меньше или равна (≤)
+          schema:
+            type: integer
+          example: 150
+
+        # coordinates.y (Long)
+        - name: filter.coordinatesY.equals
+          in: query
+          description: Координата Y ровно равна
           schema:
             type: integer
             format: int64
           example: 200
 
-        - name: filter.from.x
+        - name: filter.coordinatesY.gt
           in: query
-          description: Фильтр по X координате начальной точки
+          description: Координата Y больше (>)
+          schema:
+            type: integer
+            format: int64
+          example: 100
+
+        - name: filter.coordinatesY.gte
+          in: query
+          description: Координата Y больше или равна (≥)
+          schema:
+            type: integer
+            format: int64
+          example: 100
+
+        - name: filter.coordinatesY.lt
+          in: query
+          description: Координата Y меньше (<)
+          schema:
+            type: integer
+            format: int64
+          example: 300
+
+        - name: filter.coordinatesY.lte
+          in: query
+          description: Координата Y меньше или равна (≤)
+          schema:
+            type: integer
+            format: int64
+          example: 300
+
+        # from.x (Integer)
+        - name: filter.fromX.equals
+          in: query
+          description: X координата начальной локации равна
           schema:
             type: integer
           example: 55
 
-        - name: filter.from.y
+        - name: filter.fromX.gt
           in: query
-          description: Фильтр по Y координате начальной точки
+          description: X координата начальной локации больше (>)
+          schema:
+            type: integer
+          example: 50
+
+        - name: filter.fromX.gte
+          in: query
+          description: X координата начальной локации больше или равна (≥)
+          schema:
+            type: integer
+          example: 50
+
+        - name: filter.fromX.lt
+          in: query
+          description: X координата начальной локации меньше (<)
+          schema:
+            type: integer
+          example: 60
+
+        - name: filter.fromX.lte
+          in: query
+          description: X координата начальной локации меньше или равна (≤)
+          schema:
+            type: integer
+          example: 60
+
+        # from.y (long)
+        - name: filter.fromY.equals
+          in: query
+          description: Y координата начальной локации равна
           schema:
             type: integer
             format: int64
           example: 37
 
-        - name: filter.from.name
+        - name: filter.fromY.gt
           in: query
-          description: Фильтр по названию начальной точки (поиск подстроки)
-          schema:
-            type: string
-          example: "Москва"
-
-        - name: filter.to.x
-          in: query
-          description: Фильтр по X координате конечной точки
-          schema:
-            type: integer
-          example: 59
-
-        - name: filter.to.y
-          in: query
-          description: Фильтр по Y координате конечной точки
+          description: Y координата начальной локации больше (>)
           schema:
             type: integer
             format: int64
           example: 30
 
-        - name: filter.to.name
+        - name: filter.fromY.gte
           in: query
-          description: Фильтр по названию конечной точки (поиск подстроки)
+          description: Y координата начальной локации больше или равна (≥)
+          schema:
+            type: integer
+            format: int64
+          example: 30
+
+        - name: filter.fromY.lt
+          in: query
+          description: Y координата начальной локации меньше (<)
+          schema:
+            type: integer
+            format: int64
+          example: 40
+
+        - name: filter.fromY.lte
+          in: query
+          description: Y координата начальной локации меньше или равна (≤)
+          schema:
+            type: integer
+            format: int64
+          example: 40
+
+        # from.name (String)
+        - name: filter.fromName.equals
+          in: query
+          description: Точное совпадение названия начальной локации
           schema:
             type: string
+            minLength: 1
+          example: "Москва"
+
+        - name: filter.fromName.contains
+          in: query
+          description: Поиск подстроки в названии начальной локации
+          schema:
+            type: string
+            minLength: 1
+          example: "Моск"
+
+        # to.x (Integer)
+        - name: filter.toX.equals
+          in: query
+          description: X координата конечной локации равна
+          schema:
+            type: integer
+          example: 59
+
+        - name: filter.toX.gt
+          in: query
+          description: X координата конечной локации больше (>)
+          schema:
+            type: integer
+          example: 50
+
+        - name: filter.toX.gte
+          in: query
+          description: X координата конечной локации больше или равна (≥)
+          schema:
+            type: integer
+          example: 50
+
+        - name: filter.toX.lt
+          in: query
+          description: X координата конечной локации меньше (<)
+          schema:
+            type: integer
+          example: 60
+
+        - name: filter.toX.lte
+          in: query
+          description: X координата конечной локации меньше или равна (≤)
+          schema:
+            type: integer
+          example: 60
+
+        # to.y (long)
+        - name: filter.toY.equals
+          in: query
+          description: Y координата конечной локации равна
+          schema:
+            type: integer
+            format: int64
+          example: 30
+
+        - name: filter.toY.gt
+          in: query
+          description: Y координата конечной локации больше (>)
+          schema:
+            type: integer
+            format: int64
+          example: 20
+
+        - name: filter.toY.gte
+          in: query
+          description: Y координата конечной локации больше или равна (≥)
+          schema:
+            type: integer
+            format: int64
+          example: 20
+
+        - name: filter.toY.lt
+          in: query
+          description: Y координата конечной локации меньше (<)
+          schema:
+            type: integer
+            format: int64
+          example: 40
+
+        - name: filter.toY.lte
+          in: query
+          description: Y координата конечной локации меньше или равна (≤)
+          schema:
+            type: integer
+            format: int64
+          example: 40
+
+        # to.name (String)
+        - name: filter.toName.equals
+          in: query
+          description: Точное совпадение названия конечной локации
+          schema:
+            type: string
+            minLength: 1
           example: "Санкт-Петербург"
+
+        - name: filter.toName.contains
+          in: query
+          description: Поиск подстроки в названии конечной локации
+          schema:
+            type: string
+            minLength: 1
+          example: "Петербург"
 
       responses:
         '200':
@@ -284,6 +582,28 @@ paths:
                   </details>
                 </ErrorResponse>
 
+        '500':
+          description: |
+            Внутренняя ошибка сервера.
+            
+            Возможные причины:
+            - Недоступен первый сервис
+            - Непредвиденная ошибка обработки
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example: |
+                <?xml version="1.0" encoding="UTF-8"?>
+                <ErrorResponse>
+                  <code>500</code>
+                  <message>Внутренняя ошибка сервера</message>
+                  <timestamp>2024-01-20T10:30:00</timestamp>
+                  <path>/navigator/route/add/1/2/650.5</path>
+                  <details>
+                    <detail>Не удалось получить маршруты: сервис управления маршрутами недоступен</detail>
+                  </details>
+                </ErrorResponse>
     post:
       tags:
         - Routes CRUD
@@ -367,6 +687,29 @@ paths:
                     <detail>Значение поля 'distance' должно быть больше 1</detail>
                   </details>
                 </ErrorResponse>
+        '500':
+          description: |
+            Внутренняя ошибка сервера.
+            
+            Возможные причины:
+            - Недоступен первый сервис
+            - Ошибка при создании маршрута в первом сервисе
+            - Непредвиденная ошибка обработки
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example: |
+                <?xml version="1.0" encoding="UTF-8"?>
+                <ErrorResponse>
+                  <code>500</code>
+                  <message>Внутренняя ошибка сервера</message>
+                  <timestamp>2024-01-20T10:30:00</timestamp>
+                  <path>/navigator/route/add/1/2/650.5</path>
+                  <details>
+                    <detail>Не удалось создать маршрут: сервис управления маршрутами недоступен</detail>
+                  </details>
+                </ErrorResponse>
 
   /routes/{id}:
     get:
@@ -415,6 +758,29 @@ paths:
                   <timestamp>2024-01-15T10:30:00</timestamp>
                   <details>
                     <detail>Маршрут с ID=999 не существует</detail>
+                  </details>
+                </ErrorResponse>
+        '500':
+          description: |
+            Внутренняя ошибка сервера.
+            
+            Возможные причины:
+            - Недоступен первый сервис
+            - Ошибка при поиске маршрута
+            - Непредвиденная ошибка обработки
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example: |
+                <?xml version="1.0" encoding="UTF-8"?>
+                <ErrorResponse>
+                  <code>500</code>
+                  <message>Внутренняя ошибка сервера</message>
+                  <timestamp>2024-01-20T10:30:00</timestamp>
+                  <path>/navigator/route/add/1/2/650.5</path>
+                  <details>
+                    <detail>Не удалось найти маршрут: сервис управления маршрутами недоступен</detail>
                   </details>
                 </ErrorResponse>
 
@@ -474,6 +840,30 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
+        '500':
+          description: |
+            Внутренняя ошибка сервера.
+
+            Возможные причины:
+            - Недоступен первый сервис
+            - Ошибка при обновлении маршрута в первом сервисе
+            - Непредвиденная ошибка обработки
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example: |
+                <?xml version="1.0" encoding="UTF-8"?>
+                <ErrorResponse>
+                  <code>500</code>
+                  <message>Внутренняя ошибка сервера</message>
+                  <timestamp>2024-01-20T10:30:00</timestamp>
+                  <path>/navigator/route/add/1/2/650.5</path>
+                  <details>
+                    <detail>Не удалось обновить маршрут: сервис управления маршрутами недоступен</detail>
+                  </details>
+                </ErrorResponse>
+
     delete:
       tags:
         - Routes CRUD
@@ -509,6 +899,30 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
+        '500':
+          description: |
+            Внутренняя ошибка сервера.
+
+            Возможные причины:
+            - Недоступен первый сервис
+            - Ошибка при удалении маршрута в первом сервисе
+            - Непредвиденная ошибка обработки
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example: |
+                <?xml version="1.0" encoding="UTF-8"?>
+                <ErrorResponse>
+                  <code>500</code>
+                  <message>Внутренняя ошибка сервера</message>
+                  <timestamp>2024-01-20T10:30:00</timestamp>
+                  <path>/navigator/route/add/1/2/650.5</path>
+                  <details>
+                    <detail>Не удалось удалить маршрут: сервис управления маршрутами недоступен</detail>
+                  </details>
+                </ErrorResponse>
+
   /routes/distance/sum:
     get:
       tags:
@@ -539,6 +953,29 @@ paths:
                   <maxDistance>1200.75</maxDistance>
                 </DistanceSumResponse>
 
+
+        '500':
+          description: |
+            Внутренняя ошибка сервера.
+            
+            Возможные причины:
+            - Недоступен первый сервис
+            - Непредвиденная ошибка обработки
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example: |
+                <?xml version="1.0" encoding="UTF-8"?>
+                <ErrorResponse>
+                  <code>500</code>
+                  <message>Внутренняя ошибка сервера</message>
+                  <timestamp>2024-01-20T10:30:00</timestamp>
+                  <path>/navigator/route/add/1/2/650.5</path>
+                  <details>
+                    <detail>Не удалось посчитать сумму: сервис управления маршрутами недоступен</detail>
+                  </details>
+                </ErrorResponse>
   /routes/distance/group:
     get:
       tags:
@@ -580,6 +1017,28 @@ paths:
                   <totalRoutes>24</totalRoutes>
                 </DistanceGroupResponse>
 
+        '500':
+          description: |
+            Внутренняя ошибка сервера.
+
+            Возможные причины:
+            - Недоступен первый сервис
+            - Непредвиденная ошибка обработки
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example: |
+                <?xml version="1.0" encoding="UTF-8"?>
+                <ErrorResponse>
+                  <code>500</code>
+                  <message>Внутренняя ошибка сервера</message>
+                  <timestamp>2024-01-20T10:30:00</timestamp>
+                  <path>/navigator/route/add/1/2/650.5</path>
+                  <details>
+                    <detail>Не удалось выполнить группировку: сервис управления маршрутами недоступен</detail>
+                  </details>
+                </ErrorResponse>
   /routes/distance/greater-than:
     get:
       tags:
@@ -651,6 +1110,28 @@ paths:
             application/xml:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: |
+            Внутренняя ошибка сервера.
+
+            Возможные причины:
+            - Недоступен первый сервис
+            - Непредвиденная ошибка обработки
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example: |
+                <?xml version="1.0" encoding="UTF-8"?>
+                <ErrorResponse>
+                  <code>500</code>
+                  <message>Внутренняя ошибка сервера</message>
+                  <timestamp>2024-01-20T10:30:00</timestamp>
+                  <path>/navigator/route/add/1/2/650.5</path>
+                  <details>
+                    <detail>Не удалось найти маршруты: сервис управления маршрутами недоступен</detail>
+                  </details>
+                </ErrorResponse>
 
 components:
   schemas:
