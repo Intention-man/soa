@@ -1,0 +1,11 @@
+<persistence-unit name="routesPU" transaction-type="JTA">
+    <jta-data-source>java:app/jdbc/routesDS</jta-data-source>
+
+    <class>com.example.routeservice.entity.Route</class>
+
+    <properties>
+        <property name="jakarta.persistence.schema-generation.database.action" value="update"/>
+        <property name="hibernate.show_sql" value="true"/>
+        <property name="hibernate.format_sql" value="true"/>
+    </properties>
+</persistence-unit>
