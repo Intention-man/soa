@@ -1,50 +1,36 @@
 package com.example.routeservice.entity;
 
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Embeddable;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
-import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
 
-@Embeddable
+@Entity
+@Table(name = "coordinates")
 @XmlRootElement(name = "coordinates")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Coordinates {
 
-    @Column(name = "coord_x", nullable = false)
-    @NotNull(message = "Координата X не может быть null")
-    @XmlElement
-    private Integer x;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    @Column(name = "coord_y", nullable = false)
-    @NotNull(message = "Координата Y не может быть null")
-    @XmlElement
+    @NotNull
+    private int x;
+
+    @NotNull
     private Long y;
 
-    public Coordinates() {
-    }
+    public Long getId() { return id; }
 
-    public Coordinates(Integer x, Long y) {
-        this.x = x;
-        this.y = y;
-    }
+    public void setId(Long id) { this.id = id; }
 
-    public Integer getX() {
-        return x;
-    }
+    public int getX() { return x; }
 
-    public void setX(Integer x) {
-        this.x = x;
-    }
+    public void setX(int x) { this.x = x; }
 
-    public Long getY() {
-        return y;
-    }
+    public Long getY() { return y; }
 
-    public void setY(Long y) {
-        this.y = y;
-    }
+    public void setY(Long y) { this.y = y; }
 }

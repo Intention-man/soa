@@ -16,7 +16,10 @@ import com.example.routeservice.filter.RouteFilter;
 import com.example.routeservice.repository.RouteRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
+import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 
 @ApplicationScoped
@@ -28,6 +31,9 @@ public class RouteServiceImpl implements RouteService {
 
     @Inject
     private Validator validator;
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @Override
     public RouteListResponse getRoutes(RouteFilter filter) {
@@ -53,45 +59,101 @@ public class RouteServiceImpl implements RouteService {
 
     @Override
     public Route createRoute(RouteCreateRequest request) {
-        // Валидация
         var violations = validator.validate(request);
         if (!violations.isEmpty()) {
             throw new ValidationException("Ошибка валидации данных",
                     violations.stream()
-                            .map(v -> v.getMessage())
+                            .map(ConstraintViolation::getMessage)
                             .collect(Collectors.toList()));
         }
 
         Route route = new Route();
         route.setName(request.getName());
-        route.setCoordinates(request.getCoordinates());
-        route.setFromLocation(request.getFromLocation());
-        route.setToLocation(request.getToLocation());
+
+        if (request.getCoordinates() != null) {
+            route.setCoordinates(mergeOrPersist(request.getCoordinates()));
+        }
+        if (request.getFromLocation() != null) {
+            route.setFromLocation(mergeOrPersist(request.getFromLocation()));
+        }
+        if (request.getToLocation() != null) {
+            route.setToLocation(mergeOrPersist(request.getToLocation()));
+        }
+
         route.setDistance(request.getDistance());
 
         return routeRepository.save(route);
     }
 
+    @Transactional
     @Override
     public Route updateRoute(Long id, RouteUpdateRequest request) {
-        // Валидация
+        System.out.println(request);
+
         var violations = validator.validate(request);
         if (!violations.isEmpty()) {
             throw new ValidationException("Ошибка валидации данных",
                     violations.stream()
-                            .map(v -> v.getMessage())
+                            .map(ConstraintViolation::getMessage)
                             .collect(Collectors.toList()));
         }
 
-        Route existingRoute = getRouteById(id);
+        Route route = getRouteById(id);
+        System.out.println(entityManager.contains(route));
 
-        existingRoute.setName(request.getName());
-        existingRoute.setCoordinates(request.getCoordinates());
-        existingRoute.setFromLocation(request.getFromLocation());
-        existingRoute.setToLocation(request.getToLocation());
-        existingRoute.setDistance(request.getDistance());
+        if (request.getName() != null) {
+            route.setName(request.getName());
+        }
+        if (request.getDistance() != null) {
+            route.setDistance(request.getDistance());
+        }
 
-        return routeRepository.update(existingRoute);
+        if (request.getCoordinates() != null) {
+            route.setCoordinates(mergeOrPersist(request.getCoordinates()));
+        }
+        if (request.getFromLocation() != null) {
+            route.setFromLocation(mergeOrPersist(request.getFromLocation()));
+        }
+        if (request.getToLocation() != null) {
+            route.setToLocation(mergeOrPersist(request.getToLocation()));
+        }
+
+        entityManager.flush();
+        return route;
+//        return routeRepository.update(route);
+    }
+
+    private <T> T mergeOrPersist(T entity) {
+        if (entity == null) {
+            return null;
+        }
+
+        Object id = getEntityId(entity);
+
+        if (id == null) {
+            entityManager.persist(entity);
+            return entity;
+        }
+        if (entityManager.contains(entity)) {
+            return entity;
+        }
+        if (entityManager.find(entity.getClass(), getEntityId(entity)) != null) {
+            return entityManager.merge(entity);
+        } else {
+            entityManager.persist(entity);
+            return entity;
+        }
+
+    }
+
+    private Object getEntityId(Object entity) {
+        try {
+            var field = entity.getClass().getDeclaredField("id");
+            field.setAccessible(true);
+            return field.get(entity);
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     @Override
@@ -103,21 +165,13 @@ public class RouteServiceImpl implements RouteService {
     @Override
     public DistanceSumResponse getDistanceSum() {
         Object[] result = routeRepository.getDistanceSum();
-
         Double totalSum = (Double) result[0];
         Long count = (Long) result[1];
         Double minDistance = (Double) result[2];
         Double maxDistance = (Double) result[3];
+        Double avg = count > 0 ? totalSum / count : 0.0;
 
-        Double averageDistance = count > 0 ? totalSum / count : 0.0;
-
-        return new DistanceSumResponse(
-                totalSum,
-                count.intValue(),
-                averageDistance,
-                minDistance,
-                maxDistance
-        );
+        return new DistanceSumResponse(totalSum, count.intValue(), avg, minDistance, maxDistance);
     }
 
     @Override
@@ -125,58 +179,27 @@ public class RouteServiceImpl implements RouteService {
         List<Object[]> groups = routeRepository.groupByDistance();
         Long totalRoutes = routeRepository.count(new RouteFilter());
 
-        List<DistanceGroupResponse.DistanceGroup> distanceGroups = groups.stream()
-                .map(group -> {
-                    Double distance = (Double) group[0];
-                    Long count = (Long) group[1];
-                    Double percentage = totalRoutes > 0 ? (count.doubleValue() / totalRoutes) * 100 : 0.0;
-
-                    return new DistanceGroupResponse.DistanceGroup(
-                            distance,
-                            count.intValue(),
-                            percentage
-                    );
-                })
+        List<DistanceGroupResponse.DistanceGroup> list = groups.stream()
+                .map(g -> new DistanceGroupResponse.DistanceGroup(
+                        (Double) g[0],
+                        ((Long) g[1]).intValue(),
+                        totalRoutes > 0 ? ((Long) g[1]).doubleValue() / totalRoutes * 100 : 0.0))
                 .collect(Collectors.toList());
 
-        return new DistanceGroupResponse(
-                distanceGroups,
-                distanceGroups.size(),
-                totalRoutes.intValue()
-        );
+        return new DistanceGroupResponse(list, list.size(), totalRoutes.intValue());
     }
 
     @Override
     public FilteredRoutesResponse getRoutesWithDistanceGreaterThan(Double minDistance) {
         if (minDistance == null || minDistance <= 1) {
-            throw new ValidationException("Некорректное значение параметра",
-                    List.of("minDistance должен быть больше 1"));
+            throw new ValidationException("Некорректное значение параметра", List.of("minDistance должен быть > 1"));
         }
 
         List<Route> routes = routeRepository.findByDistanceGreaterThan(minDistance);
+        Double min = routes.stream().map(Route::getDistance).min(Double::compare).orElse(0.0);
+        Double max = routes.stream().map(Route::getDistance).max(Double::compare).orElse(0.0);
+        Double avg = routes.stream().mapToDouble(Route::getDistance).average().orElse(0.0);
 
-        // Вычисляем статистику
-        Double minDist = routes.stream()
-                .map(Route::getDistance)
-                .min(Double::compare)
-                .orElse(0.0);
-
-        Double maxDist = routes.stream()
-                .map(Route::getDistance)
-                .max(Double::compare)
-                .orElse(0.0);
-
-        Double avgDist = routes.stream()
-                .mapToDouble(Route::getDistance)
-                .average()
-                .orElse(0.0);
-
-        return new FilteredRoutesResponse(
-                routes,
-                routes.size(),
-                minDist,
-                maxDist,
-                avgDist
-        );
+        return new FilteredRoutesResponse(routes, routes.size(), min, max, avg);
     }
 }

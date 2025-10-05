@@ -2,9 +2,13 @@
     <jta-data-source>java:app/jdbc/routesDS</jta-data-source>
 
     <class>com.example.routeservice.entity.Route</class>
+    <class>com.example.routeservice.entity.Coordinates</class>
+    <class>com.example.routeservice.entity.FromLocation</class>
+    <class>com.example.routeservice.entity.ToLocation</class>
 
     <properties>
-        <property name="jakarta.persistence.schema-generation.database.action" value="update"/>
+        <property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQLDialect"/>
+        <property name="jakarta.persistence.schema-generation.database.action" value="create-or-extend-tables"/>
         <property name="hibernate.show_sql" value="true"/>
         <property name="hibernate.format_sql" value="true"/>
     </properties>

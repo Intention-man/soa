@@ -1,4 +1,4 @@
-package com.example.routeservice.config;
+package com.example.navigator.config;
 
 
 import java.io.IOException;

@@ -1,0 +1,41 @@
+1. Пагинация
+curl "http://localhost:8080/route-management-service/api/v1/routes?page=0&size=10"
+
+
+Первая страница, 10 элементов.
+
+2. Сортировка по нескольким полям
+curl "http://localhost:8080/route-management-service/api/v1/routes?sort=distance,asc&sort=name,desc"
+
+
+Сначала сортировка по distance (возрастание), потом по name (убывание).
+
+3. Поиск по точному названию
+curl "http://localhost:8080/route-management-service/api/v1/routes?filter.name.equals=Route B"
+
+4. Поиск по подстроке
+curl "http://localhost:8080/route-management-service/api/v1/routes?filter.name.contains=Route"
+
+5. Фильтр по дистанции (равно)
+curl "http://localhost:8080/route-management-service/api/v1/routes?filter.distance.equals=123.45"
+
+6. Фильтр по дистанции (диапазон)
+curl "http://localhost:8080/route-management-service/api/v1/routes?filter.distance.min=100&filter.distance.max=500"
+
+
+Маршруты с 100 <= distance <= 500.
+
+7. Фильтр по координатам
+curl "http://localhost:8080/route-management-service/api/v1/routes?filter.coordinatesX.gt=50&filter.coordinatesY.lt=200"
+
+
+X > 50 и Y < 200.
+
+8. Фильтр по локациям
+curl "http://localhost:8080/route-management-service/api/v1/routes?filter.fromName.equals=Москва&filter.toName.contains=бург"
+
+
+Из Москвы в локацию, название которой содержит «бург» (например, Санкт-Петербург).
+
+9. Фильтр по дате создания
+curl "http://localhost:8080/route-management-service/api/v1/routes?filter.creationDate.gte=2024-01-01T00:00:00&filter.creationDate.lte=2024-12-31T23:59:59"

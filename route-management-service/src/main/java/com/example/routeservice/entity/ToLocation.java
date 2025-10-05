@@ -1,43 +1,40 @@
 package com.example.routeservice.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.xml.bind.annotation.*;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlRootElement;
 
-@Embeddable
+@Entity
+@Table(name = "to_locations")
 @XmlRootElement(name = "toLocation")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class ToLocation {
 
-    @Column(name = "to_x", nullable = false)
-    @NotNull(message = "Координата X конечной точки не может быть null")
-    @XmlElement
-    private Long x;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    @Column(name = "to_y", nullable = false)
-    @XmlElement
-    private int y;
-
-    @Column(name = "to_name", nullable = false, length = 255)
-    @NotBlank(message = "Название конечной точки не может быть пустым")
-    @NotNull(message = "Название конечной точки не может быть null")
-    @XmlElement
+    @NotNull
     private String name;
 
-    // Конструкторы, геттеры и сеттеры
-    public ToLocation() {}
+    private Long x;
+    private int y;
 
-    public ToLocation(Long x, int y, String name) {
-        this.x = x;
-        this.y = y;
-        this.name = name;
-    }
+    public Long getId() { return id; }
+
+    public void setId(Long id) { this.id = id; }
+
+    public String getName() { return name; }
+
+    public void setName(String name) { this.name = name; }
 
     public Long getX() { return x; }
+
     public void setX(Long x) { this.x = x; }
+
     public int getY() { return y; }
+
     public void setY(int y) { this.y = y; }
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
 }

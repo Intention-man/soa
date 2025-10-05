@@ -32,10 +32,8 @@ import jakarta.ws.rs.core.UriInfo;
 @Produces(MediaType.APPLICATION_XML)
 @Consumes(MediaType.APPLICATION_XML)
 public class RouteResource {
-
     @Inject
     private RouteService routeService;
-
     @Context
     private UriInfo uriInfo;
 
@@ -45,7 +43,6 @@ public class RouteResource {
             @QueryParam("size") @DefaultValue("20") Integer size,
             @QueryParam("sort") String[] sort) {
 
-        // Получаем все параметры фильтрации
         Map<String, String> filterParams = uriInfo.getQueryParameters().entrySet().stream()
                 .filter(entry -> entry.getKey().startsWith("filter."))
                 .collect(java.util.stream.Collectors.toMap(

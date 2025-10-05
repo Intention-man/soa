@@ -30,7 +30,7 @@ tags:
   - name: Routes CRUD
     description: Базовые операции с маршрутами (создание, чтение, обновление, удаление)
   - name: Routes Analytics
-    description: Аналитические операции над коллекцией маршрутов
+    description: Аналитические операци и над коллекцией маршрутов
 
 paths:
   /routes:
@@ -281,21 +281,21 @@ paths:
           description: Координата X больше или равна (≥)
           schema:
             type: integer
-          example: 50
+            example: 50
 
         - name: filter.coordinatesX.lt
           in: query
           description: Координата X меньше (<)
           schema:
             type: integer
-          example: 150
+            example: 150
 
         - name: filter.coordinatesX.lte
           in: query
           description: Координата X меньше или равна (≤)
           schema:
             type: integer
-          example: 150
+            example: 150
 
         # coordinates.y (Long)
         - name: filter.coordinatesY.equals
@@ -432,12 +432,13 @@ paths:
             minLength: 1
           example: "Моск"
 
-        # to.x (Integer)
+        # to.x (Long)
         - name: filter.toX.equals
           in: query
           description: X координата конечной локации равна
           schema:
             type: integer
+            format: int64
           example: 59
 
         - name: filter.toX.gt
@@ -445,6 +446,7 @@ paths:
           description: X координата конечной локации больше (>)
           schema:
             type: integer
+            format: int64
           example: 50
 
         - name: filter.toX.gte
@@ -452,6 +454,7 @@ paths:
           description: X координата конечной локации больше или равна (≥)
           schema:
             type: integer
+            format: int64
           example: 50
 
         - name: filter.toX.lt
@@ -459,6 +462,7 @@ paths:
           description: X координата конечной локации меньше (<)
           schema:
             type: integer
+            format: int64
           example: 60
 
         - name: filter.toX.lte
@@ -466,15 +470,15 @@ paths:
           description: X координата конечной локации меньше или равна (≤)
           schema:
             type: integer
+            format: int64
           example: 60
 
-        # to.y (long)
+        # to.y (int)
         - name: filter.toY.equals
           in: query
           description: Y координата конечной локации равна
           schema:
             type: integer
-            format: int64
           example: 30
 
         - name: filter.toY.gt
@@ -482,7 +486,6 @@ paths:
           description: Y координата конечной локации больше (>)
           schema:
             type: integer
-            format: int64
           example: 20
 
         - name: filter.toY.gte
@@ -490,24 +493,21 @@ paths:
           description: Y координата конечной локации больше или равна (≥)
           schema:
             type: integer
-            format: int64
-          example: 20
+            example: 20
 
         - name: filter.toY.lt
           in: query
           description: Y координата конечной локации меньше (<)
           schema:
             type: integer
-            format: int64
-          example: 40
+            example: 40
 
         - name: filter.toY.lte
           in: query
           description: Y координата конечной локации меньше или равна (≤)
           schema:
             type: integer
-            format: int64
-          example: 40
+            example: 40
 
         # to.name (String)
         - name: filter.toName.equals
@@ -545,16 +545,16 @@ paths:
                         <y>200</y>
                       </coordinates>
                       <creationDate>2024-01-15T10:30:00</creationDate>
-                      <from>
+                      <fromLocation>
                         <x>55</x>
                         <y>37</y>
                         <name>Москва</name>
-                      </from>
-                      <to>
+                      </fromLocation>
+                      <toLocation>
                         <x>59</x>
                         <y>30</y>
                         <name>Санкт-Петербург</name>
-                      </to>
+                      </toLocation>
                       <distance>650.5</distance>
                     </route>
                   </routes>
@@ -618,8 +618,8 @@ paths:
         **Валидация:**
         - `name` не может быть null или пустым
         - `coordinates` не может быть null
-        - `from` не может быть null
-        - `to` не может быть null
+        - `fromLocation` не может быть null
+        - `toLocation` не может быть null
         - `distance` должна быть больше 1
         - Все обязательные поля должны быть заполнены
       operationId: createRoute
@@ -638,16 +638,16 @@ paths:
                   <x>100</x>
                   <y>200</y>
                 </coordinates>
-                <from>
+                <fromLocation>
                   <x>55</x>
                   <y>37</y>
                   <name>Москва</name>
-                </from>
-                <to>
+                </fromLocation>
+                <toLocation>
                   <x>59</x>
                   <y>30</y>
                   <name>Санкт-Петербург</name>
-                </to>
+                </toLocation>
                 <distance>650.5</distance>
               </RouteCreateRequest>
 
@@ -1081,16 +1081,16 @@ paths:
                         <y>250</y>
                       </coordinates>
                       <creationDate>2024-01-20T14:30:00</creationDate>
-                      <from>
+                      <fromLocation>
                         <x>55</x>
                         <y>37</y>
                         <name>Москва</name>
-                      </from>
-                      <to>
+                      </fromLocation>
+                      <toLocation>
                         <x>104</x>
                         <y>52</y>
                         <name>Иркутск</name>
-                      </to>
+                      </toLocation>
                       <distance>5042.0</distance>
                     </route>
                   </routes>
@@ -1145,8 +1145,8 @@ components:
         - name
         - coordinates
         - creationDate
-        - from
-        - to
+        - fromLocation
+        - toLocation
         - distance
       properties:
         id:
@@ -1172,10 +1172,10 @@ components:
             Дата и время создания маршрута.
             Генерируется автоматически при создании.
           example: "2024-01-15T10:30:00"
-        from:
-          $ref: '#/components/schemas/Location'
-        to:
-          $ref: '#/components/schemas/Location'
+        fromLocation:
+          $ref: '#/components/schemas/FromLocation'
+        toLocation:
+          $ref: '#/components/schemas/ToLocation'
         distance:
           type: number
           format: double
@@ -1191,8 +1191,8 @@ components:
       required:
         - name
         - coordinates
-        - from
-        - to
+        - fromLocation
+        - toLocation
         - distance
       properties:
         name:
@@ -1203,10 +1203,10 @@ components:
           example: "Новый маршрут"
         coordinates:
           $ref: '#/components/schemas/Coordinates'
-        from:
-          $ref: '#/components/schemas/Location'
-        to:
-          $ref: '#/components/schemas/Location'
+        fromLocation:
+          $ref: '#/components/schemas/FromLocation'
+        toLocation:
+          $ref: '#/components/schemas/ToLocation'
         distance:
           type: number
           format: double
@@ -1222,8 +1222,8 @@ components:
       required:
         - name
         - coordinates
-        - from
-        - to
+        - fromLocation
+        - toLocation
         - distance
       properties:
         name:
@@ -1234,10 +1234,10 @@ components:
           example: "Обновленный маршрут"
         coordinates:
           $ref: '#/components/schemas/Coordinates'
-        from:
-          $ref: '#/components/schemas/Location'
-        to:
-          $ref: '#/components/schemas/Location'
+        fromLocation:
+          $ref: '#/components/schemas/FromLocation'
+        toLocation:
+          $ref: '#/components/schemas/ToLocation'
         distance:
           type: number
           format: double
@@ -1265,11 +1265,11 @@ components:
           description: Координата Y (не может быть null)
           example: 200
 
-    Location:
+    FromLocation:
       type: object
       xml:
-        name: location
-      description: Описание локации (начальной или конечной точки маршрута)
+        name: fromLocation
+      description: Описание начальной точки маршрута
       required:
         - x
         - y
@@ -1278,19 +1278,46 @@ components:
         x:
           type: integer
           format: int32
-          description: Координата X локации (не может быть null)
+          description: Координата X начальной локации (не может быть null)
           example: 55
         y:
           type: integer
           format: int64
-          description: Координата Y локации
+          description: Координата Y начальной локации
           example: 37
         name:
           type: string
-          description: Название локации
+          description: Название начальной локации (не может быть null)
           minLength: 1
           maxLength: 255
           example: "Москва"
+
+    ToLocation:
+      type: object
+      xml:
+        name: toLocation
+      description: Описание конечной точки маршрута
+      required:
+        - x
+        - y
+        - name
+      properties:
+        x:
+          type: integer
+          format: int64
+          description: Координата X конечной локации (не может быть null)
+          example: 59
+        y:
+          type: integer
+          format: int32
+          description: Координата Y конечной локации
+          example: 30
+        name:
+          type: string
+          description: Название конечной локации (не может быть null или пустым)
+          minLength: 1
+          maxLength: 255
+          example: "Санкт-Петербург"
 
     RouteListResponse:
       type: object

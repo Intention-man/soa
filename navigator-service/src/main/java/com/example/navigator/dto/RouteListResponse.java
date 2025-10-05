@@ -1,13 +1,15 @@
-package com.example.routeservice.dto;
+package com.example.navigator.dto;
 
-import com.example.routeservice.entity.Route;
-import jakarta.xml.bind.annotation.*;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlElementWrapper;
 import java.util.List;
 
 @XmlRootElement(name = "RouteListResponse")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class RouteListResponse {
-
     @XmlElementWrapper(name = "routes")
     @XmlElement(name = "route")
     private List<Route> routes;
@@ -25,15 +27,6 @@ public class RouteListResponse {
     private Integer pageSize;
 
     public RouteListResponse() {}
-
-    public RouteListResponse(List<Route> routes, Long totalElements,
-                             Integer totalPages, Integer currentPage, Integer pageSize) {
-        this.routes = routes;
-        this.totalElements = totalElements;
-        this.totalPages = totalPages;
-        this.currentPage = currentPage;
-        this.pageSize = pageSize;
-    }
 
     public List<Route> getRoutes() { return routes; }
     public void setRoutes(List<Route> routes) { this.routes = routes; }

@@ -7,6 +7,7 @@ import java.util.Optional;
 
 import com.example.routeservice.entity.Route;
 import com.example.routeservice.filter.RouteFilter;
+import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
@@ -17,6 +18,7 @@ import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 
+@ApplicationScoped
 public class RouteRepositoryImpl implements RouteRepository {
 
     @PersistenceContext
@@ -49,8 +51,12 @@ public class RouteRepositoryImpl implements RouteRepository {
 
     @Override
     public Route save(Route route) {
-        entityManager.persist(route);
-        return route;
+        if (route.getId() == null) {
+            entityManager.persist(route);
+            return route;
+        } else {
+            return entityManager.merge(route);
+        }
     }
 
     @Override
@@ -74,7 +80,6 @@ public class RouteRepositoryImpl implements RouteRepository {
 
         cq.select(cb.count(root));
 
-        // Применяем фильтрацию
         applyFilters(cb, cq, root, filter);
 
         return entityManager.createQuery(cq).getSingleResult();
@@ -82,14 +87,12 @@ public class RouteRepositoryImpl implements RouteRepository {
 
     @Override
     public Object[] getDistanceSum() {
-        return (Object[]) entityManager.createNamedQuery("Route.sumDistance")
-                .getSingleResult();
+        return (Object[]) entityManager.createNamedQuery("Route.sumDistance").getSingleResult();
     }
 
     @Override
     public List<Object[]> groupByDistance() {
-        return entityManager.createNamedQuery("Route.groupByDistance")
-                .getResultList();
+        return entityManager.createNamedQuery("Route.groupByDistance").getResultList();
     }
 
     @Override
@@ -134,20 +137,6 @@ public class RouteRepositoryImpl implements RouteRepository {
                     }
                     default -> { /* ignore */ }
                 }
-
-//                switch (operation) {
-//                    case "equals" -> predicates.add(cb.equal(path, parseValue(field, value)));
-//                    case "contains" -> predicates.add(
-//                            cb.like(cb.lower(path.as(String.class)), "%" + value.toLowerCase() + "%"));
-//                    case "gt" -> predicates.add(cb.gt(path.as(Number.class), (Number) parseValue(field, value)));
-//                    case "gte" -> predicates.add(cb.ge(path.as(Number.class), (Number) parseValue(field, value)));
-//                    case "lt" -> predicates.add(cb.lt(path.as(Number.class), (Number) parseValue(field, value)));
-//                    case "lte" -> predicates.add(cb.le(path.as(Number.class), (Number) parseValue(field, value)));
-//                    case "min" -> predicates.add(cb.ge(path.as(Number.class), (Number) parseValue(field, value)));
-//                    case "max" -> predicates.add(cb.le(path.as(Number.class), (Number) parseValue(field, value)));
-//                    default -> {
-//                    }
-//                }
             }
         }
 

@@ -14,6 +14,8 @@ public class GlobalExceptionHandler implements ExceptionMapper<Exception> {
 
     @Override
     public Response toResponse(Exception exception) {
+        exception.printStackTrace();
+
         ErrorResponse errorResponse;
 
         if (exception instanceof RouteNotFoundException) {
@@ -40,7 +42,7 @@ public class GlobalExceptionHandler implements ExceptionMapper<Exception> {
         } else if (exception instanceof ConstraintViolationException) {
             ConstraintViolationException cve = (ConstraintViolationException) exception;
             List<String> errors = cve.getConstraintViolations().stream()
-                    .map(ConstraintViolation::getMessage)
+                    .map(cv -> cv.getPropertyPath() + ": " + cv.getMessage())
                     .collect(Collectors.toList());
 
             errorResponse = new ErrorResponse(
@@ -53,11 +55,16 @@ public class GlobalExceptionHandler implements ExceptionMapper<Exception> {
                     .entity(errorResponse)
                     .build();
         } else {
+            String details = exception.toString();
+            for (StackTraceElement el : exception.getStackTrace()) {
+                details += "\n" + el.toString();
+            }
+
             errorResponse = new ErrorResponse(
                     500,
                     "Внутренняя ошибка сервера",
                     null,
-                    List.of(exception.getMessage())
+                    List.of(details)
             );
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                     .entity(errorResponse)

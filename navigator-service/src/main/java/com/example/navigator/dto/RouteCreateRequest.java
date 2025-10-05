@@ -1,36 +1,38 @@
-package com.example.routeservice.dto;
+package com.example.navigator.dto;
 
-import com.example.routeservice.entity.Coordinates;
-import com.example.routeservice.entity.FromLocation;
-import com.example.routeservice.entity.ToLocation;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.*;
-import jakarta.xml.bind.annotation.*;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlElement;
 
-@XmlRootElement(name = "RouteUpdateRequest")
+@XmlRootElement(name = "RouteCreateRequest")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class RouteUpdateRequest {
-
-    @NotBlank(message = "Название маршрута не может быть пустым")
-    @Size(max = 255, message = "Название маршрута не может превышать 255 символов")
+public class RouteCreateRequest {
     @XmlElement
     private String name;
 
-    @Valid
     @XmlElement
     private Coordinates coordinates;
 
-    @Valid
-    @XmlElement
+    @XmlElement(name = "fromLocation")
     private FromLocation fromLocation;
 
-    @Valid
-    @XmlElement
+    @XmlElement(name = "toLocation")
     private ToLocation toLocation;
 
-    @DecimalMin(value = "1.01", message = "Дистанция должна быть больше 1")
     @XmlElement
     private Double distance;
+
+    public RouteCreateRequest() {}
+
+    public RouteCreateRequest(String name, Coordinates coordinates,
+                              FromLocation fromLocation, ToLocation toLocation, Double distance) {
+        this.name = name;
+        this.coordinates = coordinates;
+        this.fromLocation = fromLocation;
+        this.toLocation = toLocation;
+        this.distance = distance;
+    }
 
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
