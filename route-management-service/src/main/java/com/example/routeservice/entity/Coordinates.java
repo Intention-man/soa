@@ -22,6 +22,13 @@ public class Coordinates {
     @NotNull
     private Long y;
 
+    public Coordinates() {}
+
+    public Coordinates(Integer x, long y) {
+        this.x = x;
+        this.y = y;
+    }
+
     public Long getId() { return id; }
 
     public void setId(Long id) { this.id = id; }

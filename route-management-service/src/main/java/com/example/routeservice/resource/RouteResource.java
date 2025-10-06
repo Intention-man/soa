@@ -11,7 +11,7 @@ import com.example.routeservice.dto.RouteListResponse;
 import com.example.routeservice.dto.RouteUpdateRequest;
 import com.example.routeservice.entity.Route;
 import com.example.routeservice.filter.RouteFilter;
-import com.example.routeservice.service.RouteService;
+import com.example.routeservice.service.RouteServiceImpl;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
@@ -33,7 +33,7 @@ import jakarta.ws.rs.core.UriInfo;
 @Consumes(MediaType.APPLICATION_XML)
 public class RouteResource {
     @Inject
-    private RouteService routeService;
+    private RouteServiceImpl routeService;
     @Context
     private UriInfo uriInfo;
 
@@ -110,4 +110,47 @@ public class RouteResource {
         FilteredRoutesResponse response = routeService.getRoutesWithDistanceGreaterThan(minDistance);
         return Response.ok(response).build();
     }
+
+
+    // FOR PROXY SERVICE
+
+
+    @POST
+    @Path("/add/{idFrom}/{idTo}/{distance}")
+    @Produces(MediaType.APPLICATION_XML)
+    public Response createRouteBetweenLocations(
+            @PathParam("idFrom") Long idFrom,
+            @PathParam("idTo") Long idTo,
+            @PathParam("distance") Double distance) {
+
+        try {
+            var fromLoc = routeService.getFromLocationById(idFrom);
+            var toLoc = routeService.getToLocationById(idTo);
+
+            if (fromLoc == null || toLoc == null) {
+                return Response.status(Response.Status.NOT_FOUND)
+                        .entity("<error>One or both locations not found</error>")
+                        .build();
+            }
+
+            var coords = routeService.getMidCoords(fromLoc, toLoc);
+
+            String name = String.format("Route from %s to %s", fromLoc.getName(), toLoc.getName());
+            var request = new RouteCreateRequest(name, coords, fromLoc, toLoc, distance);
+            Route created = routeService.createRoute(request);
+
+            URI location = uriInfo.getAbsolutePathBuilder()
+                    .path(created.getId().toString())
+                    .build();
+
+            return Response.created(location).entity(created).build();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.serverError()
+                    .entity("<error>" + e.getMessage() + "</error>")
+                    .build();
+        }
+    }
+
 }

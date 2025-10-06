@@ -200,16 +200,17 @@ public class RouteRepositoryImpl implements RouteRepository {
         return switch (field) {
             case "coordinatesX" -> root.get("coordinates").get("x");
             case "coordinatesY" -> root.get("coordinates").get("y");
+            case "fromId" -> root.get("fromLocation").get("id");
             case "fromX" -> root.get("fromLocation").get("x");
             case "fromY" -> root.get("fromLocation").get("y");
             case "fromName" -> root.get("fromLocation").get("name");
+            case "toId" -> root.get("toLocation").get("id");
             case "toX" -> root.get("toLocation").get("x");
             case "toY" -> root.get("toLocation").get("y");
             case "toName" -> root.get("toLocation").get("name");
             default -> root.get(field);
         };
     }
-
 
     private Object parseValue(String field, String value) {
         try {

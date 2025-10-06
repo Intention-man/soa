@@ -43,7 +43,15 @@ public class RouteCreateRequest {
     @XmlElement
     private Double distance;
 
-    // Геттеры и сеттеры
+    public RouteCreateRequest(String name, Coordinates coordinates, FromLocation fromLocation, ToLocation toLocation,
+                              Double distance) {
+        this.name = name;
+        this.coordinates = coordinates;
+        this.fromLocation = fromLocation;
+        this.toLocation = toLocation;
+        this.distance = distance;
+    }
+
     public String getName() {
         return name;
     }

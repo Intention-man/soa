@@ -1,13 +1,19 @@
 package com.example.navigator.resource;
 
-import com.example.navigator.dto.*;
+import java.util.List;
+
+import com.example.navigator.dto.Route;
+import com.example.navigator.dto.RouteListResponse;
 import com.example.navigator.service.NavigatorService;
 import jakarta.inject.Inject;
-import jakarta.ws.rs.*;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import java.net.URI;
-import java.util.List;
 
 @Path("/navigator")
 @Produces(MediaType.APPLICATION_XML)
@@ -28,7 +34,6 @@ public class NavigatorResource {
             @PathParam("idTo") Long idTo,
             @PathParam("orderBy") String orderBy) {
 
-        // Получаем список маршрутов из первого сервиса
         List<Route> found;
         try {
             found = navigatorService.findRoutesBetween(idFrom, idTo, orderBy);
@@ -48,9 +53,6 @@ public class NavigatorResource {
         return Response.ok(response).build();
     }
 
-    /**
-     * Добавить новый маршрут между локациями, взятыми из маршрутов idFrom и idTo (копируем дескрипторы from/to).
-     */
     @POST
     @Path("/route/add/{idFrom}/{idTo}/{distance}")
     public Response addRouteBetween(
@@ -58,39 +60,57 @@ public class NavigatorResource {
             @PathParam("idTo") Long idTo,
             @PathParam("distance") Double distance) {
 
-        Route fromRoute = navigatorService.getRouteById(idFrom);
-        Route toRoute = navigatorService.getRouteById(idTo);
-
-        if (fromRoute == null || toRoute == null) {
-            return Response.status(Response.Status.NOT_FOUND).build();
-        }
-
-        FromLocation fromLoc = fromRoute.getFromLocation();
-        ToLocation toLoc = toRoute.getToLocation();
-        Coordinates coords = fromRoute.getCoordinates();
-
-        String name = String.format("Nav route from %s to %s",
-                fromLoc != null ? fromLoc.getName() : "unknown",
-                toLoc != null ? toLoc.getName() : "unknown");
-
-        RouteCreateRequest create = new RouteCreateRequest(
-                name,
-                coords,
-                fromLoc,
-                toLoc,
-                distance
+        String targetUrl = String.format(
+                "http://localhost:8080/route-management-service/routes/add/%d/%d/%s",
+                idFrom, idTo, distance.toString()
         );
 
-        Route created;
         try {
-            created = navigatorService.createRoute(create);
+            jakarta.ws.rs.client.Client client = jakarta.ws.rs.client.ClientBuilder.newClient();
+
+            Response response = client
+                    .target(targetUrl)
+                    .request(MediaType.APPLICATION_XML)
+                    .post(null);
+
+            return Response.status(response.getStatus())
+                    .entity(response.readEntity(String.class))
+                    .type(MediaType.APPLICATION_XML)
+                    .build();
+
         } catch (Exception e) {
+            e.printStackTrace();
             return Response.serverError()
                     .entity("<error>" + e.getMessage() + "</error>")
                     .build();
         }
-
-        URI location = URI.create(String.format("/navigator/routes/%d", created.getId()));
-        return Response.created(location).entity(created).build();
     }
+//
+//    /**
+//     * Добавить новый маршрут между локациями, взятыми из маршрутов idFrom и idTo (копируем дескрипторы from/to).
+//     */
+//    @POST
+//    @Path("/route/add/{idFrom}/{idTo}/{distance}")
+//    public Response addRouteBetween(
+//            @PathParam("idFrom") Long idFrom,
+//            @PathParam("idTo") Long idTo,
+//            @PathParam("distance") Double distance) {
+//
+//        Route fromRoute = navigatorService.getRouteById(idFrom);
+//        Route toRoute = navigatorService.getRouteById(idTo);
+//
+//        if (fromRoute == null || toRoute == null) {
+//            return Response.status(Response.Status.NOT_FOUND).build();
+//        }
+//
+//        try {
+//            Route created = navigatorService.createRoute(distance, fromRoute, toRoute);
+//            URI location = URI.create(String.format("/navigator/route/%d", created.getId()));
+//            return Response.created(location).entity(created).build();
+//        } catch (Exception e) {
+//            return Response.serverError()
+//                    .entity("<error>" + e.getMessage() + "</error>")
+//                    .build();
+//        }
+//    }
 }

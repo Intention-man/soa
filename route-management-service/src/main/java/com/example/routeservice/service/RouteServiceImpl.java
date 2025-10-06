@@ -9,7 +9,10 @@ import com.example.routeservice.dto.FilteredRoutesResponse;
 import com.example.routeservice.dto.RouteCreateRequest;
 import com.example.routeservice.dto.RouteListResponse;
 import com.example.routeservice.dto.RouteUpdateRequest;
+import com.example.routeservice.entity.Coordinates;
+import com.example.routeservice.entity.FromLocation;
 import com.example.routeservice.entity.Route;
+import com.example.routeservice.entity.ToLocation;
 import com.example.routeservice.exception.RouteNotFoundException;
 import com.example.routeservice.exception.ValidationException;
 import com.example.routeservice.filter.RouteFilter;
@@ -120,7 +123,6 @@ public class RouteServiceImpl implements RouteService {
 
         entityManager.flush();
         return route;
-//        return routeRepository.update(route);
     }
 
     private <T> T mergeOrPersist(T entity) {
@@ -202,4 +204,31 @@ public class RouteServiceImpl implements RouteService {
 
         return new FilteredRoutesResponse(routes, routes.size(), min, max, avg);
     }
+
+    public FromLocation getFromLocationById(Long id) {
+        return entityManager.find(FromLocation.class, id);
+    }
+
+    public ToLocation getToLocationById(Long id) {
+        return entityManager.find(ToLocation.class, id);
+    }
+
+    public Coordinates getMidCoords(FromLocation fromLoc, ToLocation toLoc) {
+        Integer midX = 0;
+        long midY = 0L;
+
+        if (fromLoc != null && toLoc != null) {
+            midX = (int) ((fromLoc.getX() + toLoc.getX()) / 2.0);
+            midY = (long) ((fromLoc.getY() + toLoc.getY()) / 2.0);
+        } else if (fromLoc != null) {
+            midX = fromLoc.getX();
+            midY = fromLoc.getY();
+        } else if (toLoc != null) {
+            midX = Math.toIntExact(toLoc.getX());
+            midY = toLoc.getY();
+        }
+
+        return new Coordinates(midX, midY);
+    }
+
 }
