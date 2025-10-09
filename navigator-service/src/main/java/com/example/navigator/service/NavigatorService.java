@@ -21,21 +21,11 @@ public class NavigatorService {
     public NavigatorService() {
         String env = System.getenv("FIRST_SERVICE_BASE_URL");
         if (env == null || env.isBlank()) {
-            env = "http://localhost:8080/route-management-service";
+            env = "http://localhost:18080/route-management-service";
         }
         this.firstServiceBase = env;
     }
 
-    public Route getRouteById(Long id) {
-        String url = String.format("%s/routes/%d", firstServiceBase, id);
-        Response r = client.target(url)
-                .request(MediaType.APPLICATION_XML)
-                .get();
-        if (r.getStatus() / 100 != 2) {
-            throw new RuntimeException("Failed to fetch route id=" + id + ", status=" + r.getStatus());
-        }
-        return r.readEntity(Route.class);
-    }
 
     public List<Route> findRoutesBetween(Long fromId, Long toId, String orderBy) {
         StringBuilder query = new StringBuilder();
@@ -63,5 +53,9 @@ public class NavigatorService {
 
     private static String encode(String s) {
         return URLEncoder.encode(s == null ? "" : s, StandardCharsets.UTF_8);
+    }
+
+    public String getFirstServiceBase() {
+        return firstServiceBase;
     }
 }

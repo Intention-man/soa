@@ -61,7 +61,7 @@ public class NavigatorResource {
             @PathParam("distance") Double distance) {
 
         String targetUrl = String.format(
-                "http://localhost:8080/route-management-service/routes/add/%d/%d/%s",
+                navigatorService.getFirstServiceBase() + "/routes/add/%d/%d/%s",
                 idFrom, idTo, distance.toString()
         );
 
@@ -85,32 +85,4 @@ public class NavigatorResource {
                     .build();
         }
     }
-//
-//    /**
-//     * Добавить новый маршрут между локациями, взятыми из маршрутов idFrom и idTo (копируем дескрипторы from/to).
-//     */
-//    @POST
-//    @Path("/route/add/{idFrom}/{idTo}/{distance}")
-//    public Response addRouteBetween(
-//            @PathParam("idFrom") Long idFrom,
-//            @PathParam("idTo") Long idTo,
-//            @PathParam("distance") Double distance) {
-//
-//        Route fromRoute = navigatorService.getRouteById(idFrom);
-//        Route toRoute = navigatorService.getRouteById(idTo);
-//
-//        if (fromRoute == null || toRoute == null) {
-//            return Response.status(Response.Status.NOT_FOUND).build();
-//        }
-//
-//        try {
-//            Route created = navigatorService.createRoute(distance, fromRoute, toRoute);
-//            URI location = URI.create(String.format("/navigator/route/%d", created.getId()));
-//            return Response.created(location).entity(created).build();
-//        } catch (Exception e) {
-//            return Response.serverError()
-//                    .entity("<error>" + e.getMessage() + "</error>")
-//                    .build();
-//        }
-//    }
 }
