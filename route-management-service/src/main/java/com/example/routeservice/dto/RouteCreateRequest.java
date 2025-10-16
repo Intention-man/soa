@@ -43,6 +43,9 @@ public class RouteCreateRequest {
     @XmlElement
     private Double distance;
 
+    public RouteCreateRequest(){
+    }
+
     public RouteCreateRequest(String name, Coordinates coordinates, FromLocation fromLocation, ToLocation toLocation,
                               Double distance) {
         this.name = name;

@@ -4,9 +4,13 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlSchemaType;
+import jakarta.xml.bind.annotation.XmlTransient;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Entity
 @Table(name = "routes")
@@ -41,9 +45,17 @@ public class Route {
     @NotNull
     private Double distance;
 
+    @XmlTransient
     @Column(name = "creation_date", nullable = false, updatable = false)
     private LocalDateTime creationDate = LocalDateTime.now();
 
+    @XmlElement(name = "creationDate")
+    public String getCreationDateAsString() {
+        return creationDate != null ? creationDate.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME) : null;
+    }
+
+    public void setCreationDateAsString(String date) {
+    }
 
     public Long getId() { return id; }
 

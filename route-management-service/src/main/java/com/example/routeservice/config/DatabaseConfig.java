@@ -11,7 +11,7 @@ import jakarta.enterprise.context.ApplicationScoped;
         password = "${ENV=DB_PASSWORD:rkemWfU26OYiwbkD}",
         databaseName = "${ENV=DB_NAME:studs}",
         serverName = "${ENV=DB_HOST:localhost}",
-        portNumber = 25432
+        portNumber = 5432
 )
 @ApplicationScoped
 public class DatabaseConfig {
