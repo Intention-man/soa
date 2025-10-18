@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="d7b595a3-8b27-441a-99b7-1afe05ad2a0e" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/navigator-service/src/main/java/com/example/navigator/service/NavigatorService.java" beforeDir="false" afterPath="$PROJECT_DIR$/navigator-service/src/main/java/com/example/navigator/service/NavigatorService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/navigator-service/src/main/resources/tests.sh" beforeDir="false" afterPath="$PROJECT_DIR$/navigator-service/src/main/resources/tests.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/route-management-service/src/main/java/com/example/routeservice/config/CorsResponseFilter.java" beforeDir="false" afterPath="$PROJECT_DIR$/route-management-service/src/main/java/com/example/routeservice/config/CorsResponseFilter.java" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;Intention-man&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/Intention-man/soa.git&quot;,
+    &quot;accountId&quot;: &quot;96904660-5dfa-4586-b239-704e9ea2377c&quot;
+  }
+}</component>
+  <component name="ProjectCodeStyleSettingsMigration">
+    <option name="version" value="2" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;customColor&quot;: &quot;&quot;,
+  &quot;associatedIndex&quot;: 5
+}</component>
+  <component name="ProjectId" id="33p7AQ225PWfeJv03jVj4JNaz4Y" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "lab2",
+    "last_opened_file_path": "/Users/mihailagei/Documents/ITMO/7_term/soa",
+    "project.structure.last.edited": "Modules",
+    "project.structure.proportion": "0.15",
+    "project.structure.side.proportion": "0.0"
+  },
+  "keyToStringList": {
+    "GitStage.ChangesTree.GroupingKeys": [
+      "directory",
+      "module",
+      "repository"
+    ]
+  }
+}]]></component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="d7b595a3-8b27-441a-99b7-1afe05ad2a0e" name="Changes" comment="" />
+      <created>1760002015911</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1760002015911</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="TerminalProjectNonSharedOptionsProvider">
+    <envs>
+      <env key="GSID" value="IDE:idea:6523065e408d4987b634dc3eb7da6604 IDETERM:idea:6523065e408d4987b634dc3eb7da6604" />
+    </envs>
+  </component>
+</project>

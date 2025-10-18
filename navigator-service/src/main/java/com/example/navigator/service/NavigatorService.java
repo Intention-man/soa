@@ -1,8 +1,19 @@
 package com.example.navigator.service;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.security.KeyManagementException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
 import java.util.List;
+
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManagerFactory;
 
 import com.example.navigator.dto.Route;
 import com.example.navigator.dto.RouteListResponse;
@@ -16,14 +27,32 @@ import jakarta.ws.rs.core.Response;
 public class NavigatorService {
 
     private final String firstServiceBase;
-    private final Client client = ClientBuilder.newClient();
+    private final Client client;
 
-    public NavigatorService() {
+    public NavigatorService() throws KeyStoreException, NoSuchAlgorithmException, KeyManagementException {
         String env = System.getenv("FIRST_SERVICE_BASE_URL");
         if (env == null || env.isBlank()) {
-            env = "http://localhost:18080/route-management-service";
+            env = "https://localhost:18443/route-management-service";
         }
         this.firstServiceBase = env;
+
+        KeyStore ks = KeyStore.getInstance("JKS");
+        try (FileInputStream fis = new FileInputStream("/home/studs/s367044/navigator-truststore.jks")) {
+            ks.load(fis, "changeit".toCharArray());
+        } catch (IOException | NoSuchAlgorithmException | CertificateException e) {
+            throw new RuntimeException(e);
+        }
+
+        TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+        tmf.init(ks);
+
+        SSLContext sslContext = SSLContext.getInstance("TLS");
+        sslContext.init(null, tmf.getTrustManagers(), null);
+
+        this.client = ClientBuilder.newBuilder()
+                .sslContext(sslContext)
+                .hostnameVerifier((host, session) -> true)
+                .build();
     }
 
 
