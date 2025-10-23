@@ -23,10 +23,6 @@ public class NavigatorResource {
     @Inject
     private NavigatorService navigatorService;
 
-    /**
-     * Найти маршруты между локациями по ID.
-     * orderBy: строка в формате "field,direction" (например "distance,asc" или "name,desc")
-     */
     @GET
     @Path("/routes/{idFrom}/{idTo}/{orderBy}")
     public Response findRoutesBetween(
@@ -60,24 +56,8 @@ public class NavigatorResource {
             @PathParam("idTo") Long idTo,
             @PathParam("distance") Double distance) {
 
-        String targetUrl = String.format(
-                navigatorService.getFirstServiceBase() + "/routes/add/%d/%d/%s",
-                idFrom, idTo, distance.toString()
-        );
-
         try {
-            jakarta.ws.rs.client.Client client = jakarta.ws.rs.client.ClientBuilder.newClient();
-
-            Response response = client
-                    .target(targetUrl)
-                    .request(MediaType.APPLICATION_XML)
-                    .post(null);
-
-            return Response.status(response.getStatus())
-                    .entity(response.readEntity(String.class))
-                    .type(MediaType.APPLICATION_XML)
-                    .build();
-
+            return navigatorService.addRouteBetween(idFrom, idTo, distance);
         } catch (Exception e) {
             e.printStackTrace();
             return Response.serverError()

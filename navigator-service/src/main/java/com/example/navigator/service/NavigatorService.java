@@ -1,7 +1,6 @@
 package com.example.navigator.service;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -80,11 +79,24 @@ public class NavigatorService {
         return resp.getRoutes();
     }
 
-    private static String encode(String s) {
-        return URLEncoder.encode(s == null ? "" : s, StandardCharsets.UTF_8);
+    public Response addRouteBetween(Long idFrom, Long idTo, Double distance) {
+        String targetUrl = String.format("%s/routes/add/%d/%d/%s",
+                firstServiceBase, idFrom, idTo, distance);
+
+        Response response = client
+                .target(targetUrl)
+                .request(MediaType.APPLICATION_XML)
+                .post(null);
+
+        String entity = response.readEntity(String.class);
+
+        return Response.status(response.getStatus())
+                .entity(entity)
+                .type(MediaType.APPLICATION_XML)
+                .build();
     }
 
-    public String getFirstServiceBase() {
-        return firstServiceBase;
+    private static String encode(String s) {
+        return URLEncoder.encode(s == null ? "" : s, StandardCharsets.UTF_8);
     }
 }
