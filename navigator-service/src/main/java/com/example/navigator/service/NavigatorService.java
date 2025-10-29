@@ -62,6 +62,9 @@ public class NavigatorService {
         query.append("&filter.toId.equals=").append(toId);
 
         if (orderBy != null && !orderBy.isBlank()) {
+            if (!orderBy.contains(",")) {
+                orderBy = orderBy + ",asc";
+            }
             query.append("&sort=").append(encode(orderBy));
         }
 
