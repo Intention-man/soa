@@ -1,0 +1,6 @@
+Manifest-Version: 1.0
+Archiver-Version: Plexus Archiver
+Created-By: Apache Maven
+Built-By: mihailagei
+Build-Jdk-Spec: 17
+Class-Path: route-common-1.0-SNAPSHOT.jar

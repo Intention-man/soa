@@ -1,55 +1,68 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
-                             http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.example</groupId>
-    <artifactId>route-management-service</artifactId>
+    <artifactId>route-management</artifactId>
     <version>1.0-SNAPSHOT</version>
-    <packaging>war</packaging>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>route-common</module>
+        <module>route-ejb</module>
+        <module>route-web</module>
+    </modules>
 
     <properties>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.release>17</maven.compiler.release>
+        <jakarta.version>10.0.0</jakarta.version>
+        <failOnMissingWebXml>false</failOnMissingWebXml>
+        <hibernate.version>6.6.3.Final</hibernate.version>
+        <postgresql.version>42.7.7</postgresql.version>
     </properties>
 
-    <dependencies>
-        <dependency>
-            <groupId>jakarta.platform</groupId>
-            <artifactId>jakarta.jakartaee-api</artifactId>
-            <version>10.0.0</version>
-            <scope>provided</scope>
-        </dependency>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>jakarta.platform</groupId>
+                <artifactId>jakarta.jakartaee-api</artifactId>
+                <version>${jakarta.version}</version>
+                <scope>provided</scope>
+            </dependency>
 
-        <dependency>
-            <groupId>org.postgresql</groupId>
-            <artifactId>postgresql</artifactId>
-            <version>42.7.3</version>
-        </dependency>
-    </dependencies>
+            <dependency>
+                <groupId>org.hibernate</groupId>
+                <artifactId>hibernate-core</artifactId>
+                <version>${hibernate.version}</version>
+                <scope>provided</scope>
+            </dependency>
 
-    <build>
-        <finalName>route-management-service</finalName>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.11.0</version>
-                <configuration>
-                    <release>17</release>
-                </configuration>
-            </plugin>
+            <dependency>
+                <groupId>org.postgresql</groupId>
+                <artifactId>postgresql</artifactId>
+                <version>${postgresql.version}</version>
+                <scope>provided</scope>
+            </dependency>
 
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-war-plugin</artifactId>
-                <version>3.4.0</version>
-                <configuration>
-                    <failOnMissingWebXml>false</failOnMissingWebXml>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
+            <dependency>
+                <groupId>jakarta.validation</groupId>
+                <artifactId>jakarta.validation-api</artifactId>
+                <version>3.0.2</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.glassfish.jersey.core</groupId>
+                <artifactId>jersey-client</artifactId>
+                <version>3.1.2</version>
+            </dependency>
+            <dependency>
+                <groupId>com.ecwid.consul</groupId>
+                <artifactId>consul-api</artifactId>
+                <version>1.4.5</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
 </project>
