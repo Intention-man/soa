@@ -1,7 +1,7 @@
 #!/bin/bash
 # Тестирование полного набора эндпоинтов Route Management Service
 
-BASE_URL="http://localhost:8080/route-management-service/routes"
+BASE_URL="https://localhost:28443/route-management-service/routes"
 CONTENT_TYPE="application/xml"
 
 echo "🧹 Очистка экрана..."
@@ -32,11 +32,10 @@ CREATE_BODY='<?xml version="1.0" encoding="UTF-8"?>
 </RouteCreateRequest>'
 
 
-CREATE_RESPONSE=$(curl -s -D - -o /dev/null -X POST "$BASE_URL" \
+CREATE_RESPONSE=$(curl -ks -D - -o /dev/null -X POST "$BASE_URL" \
     -H "Content-Type: $CONTENT_TYPE" \
     -d "$CREATE_BODY")
 
-# Вытаскиваем Location
 LOCATION=$(echo "$CREATE_RESPONSE" | grep -i "^Location:" | awk '{print $2}' | tr -d '\r\n')
 NEW_ID=$(basename "$LOCATION")
 
@@ -51,7 +50,7 @@ echo
 echo "=============================="
 echo "📦 Тест: ПОЛУЧЕНИЕ маршрута по ID"
 echo "=============================="
-curl -s -X GET "$BASE_URL/$NEW_ID" | xmllint --format -
+curl -ks -X GET "$BASE_URL/$NEW_ID" | xmllint --format -
 
 echo
 echo "=============================="
@@ -64,7 +63,7 @@ UPDATE_BODY='<?xml version="1.0" encoding="UTF-8"?>
     <distance>999.9</distance>
 </RouteUpdateRequest>'
 
-RESPONSE=$(curl -s -X PUT "$BASE_URL/$NEW_ID" \
+RESPONSE=$(curl -ks -X PUT "$BASE_URL/$NEW_ID" \
     -H "Content-Type: $CONTENT_TYPE" \
     -d "$UPDATE_BODY")
 
@@ -78,7 +77,7 @@ echo
 echo "=============================="
 echo "🔢 Тест: ПОЛУЧЕНИЕ всех маршрутов (страница 0, 10 элементов)"
 echo "=============================="
-curl -s "$BASE_URL?page=0&size=10" | xmllint --format -
+curl -ks "$BASE_URL?page=0&size=10" | xmllint --format -
 
 echo
 echo "=============================="
@@ -86,7 +85,7 @@ echo "🔍 Тест: ФИЛЬТРЫ и СОРТИРОВКА"
 echo "=============================="
 
 echo "➡️ Поиск по подстроке 'Route'"
-curl -s "$BASE_URL?filter.name.contains=Route" | xmllint --format -
+curl -ks "$BASE_URL?filter.name.contains=Route" | xmllint --format -
 
 echo
 echo "➡️ Фильтр по дистанции > 100"
@@ -94,31 +93,31 @@ curl -s "$BASE_URL?filter.distance.min=100" | xmllint --format -
 
 echo
 echo "➡️ Сортировка по distance ASC"
-curl -s "$BASE_URL?sort=distance,asc" | xmllint --format -
+curl -ks "$BASE_URL?sort=distance,asc" | xmllint --format -
 
 echo
 echo "=============================="
 echo "📊 Тест: /distance/sum"
 echo "=============================="
-curl -s "$BASE_URL/distance/sum" | xmllint --format -
+curl -ks "$BASE_URL/distance/sum" | xmllint --format -
 
 echo
 echo "=============================="
 echo "📈 Тест: /distance/group"
 echo "=============================="
-curl -s "$BASE_URL/distance/group" | xmllint --format -
+curl -ks "$BASE_URL/distance/group" | xmllint --format -
 
 echo
 echo "=============================="
 echo "🏁 Тест: /distance/greater-than?minDistance=300"
 echo "=============================="
-curl -s "$BASE_URL/distance/greater-than?minDistance=300" | xmllint --format -
+curl -ks "$BASE_URL/distance/greater-than?minDistance=300" | xmllint --format -
 
 echo
 echo "=============================="
 echo "🗑️ Тест: УДАЛЕНИЕ маршрута"
 echo "=============================="
-curl -s -X DELETE "$BASE_URL/$NEW_ID" -w "\nHTTP code: %{http_code}\n"
+curl -ks -X DELETE "$BASE_URL/$NEW_ID" -w "\nHTTP code: %{http_code}\n"
 
 echo
 echo "=============================="

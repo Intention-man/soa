@@ -1,10 +1,10 @@
 #!/bin/bash
 # Тестирование эндпоинтов Route Management Service
 
-BASE_URL="http://localhost:8080/route-management-service/routes"
+BASE_URL="https://localhost:28443/route-management-service/routes"
 
 echo "1️⃣ Пагинация"
-curl -s "${BASE_URL}?page=0&size=10" | xmllint --format -
+curl -ks "${BASE_URL}?page=0&size=10" | xmllint --format -
 
 echo "2️⃣ Сортировка по нескольким полям"
 curl -s "${BASE_URL}?sort=distance,asc&sort=name,desc" | xmllint --format -

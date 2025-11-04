@@ -25,7 +25,7 @@ public class DistanceGroupResponse implements Serializable {
 
     // Вложенный класс для группы
     @XmlAccessorType(XmlAccessType.FIELD)
-    public static class DistanceGroup {
+    public static class DistanceGroup implements Serializable {
         @XmlElement
         private Double distance;
 
