@@ -1,16 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="Encoding">
-    <file url="file://$PROJECT_DIR$/navigator-service/src/main/java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/navigator-service/src/main/resources" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/route-management-service/route-common/src/main/java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/route-management-service/route-common/src/main/resources" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/route-management-service/route-ejb/src/main/java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/route-management-service/route-ejb/src/main/resources" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/route-management-service/route-web/src/main/java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/route-management-service/route-web/src/main/resources" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/route-management-service/src/main/java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/route-management-service/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/navigator-service-spring-cloud/config-server/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/navigator-service-spring-cloud/config-server/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/navigator-service-spring-cloud/eureka-server/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/navigator-service-spring-cloud/eureka-server/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/navigator-service-spring-cloud/navigator-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/navigator-service-spring-cloud/navigator-service/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/navigator-service-spring-cloud/zuul-gateway/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/navigator-service-spring-cloud/zuul-gateway/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/route-service-javaee/route-ear/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/route-service-javaee/route-ear/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/route-service-javaee/route-management-service/route-common/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/route-service-javaee/route-management-service/route-common/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/route-service-javaee/route-management-service/route-ejb/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/route-service-javaee/route-management-service/route-ejb/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/route-service-javaee/route-management-service/route-web/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/route-service-javaee/route-management-service/route-web/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/route-service-javaee/route-management-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/route-service-javaee/route-management-service/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/resources" charset="UTF-8" />
   </component>
