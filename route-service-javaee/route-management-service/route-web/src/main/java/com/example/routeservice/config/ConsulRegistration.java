@@ -17,8 +17,8 @@ public class ConsulRegistration {
         NewService service = new NewService();
         service.setId("route-service-1");
         service.setName("route-service");
-        service.setPort(18080); // порт веб-модуля
-        service.setAddress("localhost"); // IP/hostname
+        service.setPort(18080);
+        service.setAddress("localhost");
         consulClient.agentServiceRegister(service);
     }
 }

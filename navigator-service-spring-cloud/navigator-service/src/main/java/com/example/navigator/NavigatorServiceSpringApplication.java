@@ -22,17 +22,15 @@ public class NavigatorServiceSpringApplication {
     }
 
     @Bean
-    // 🔑 Теперь это обычный RestTemplate, настроенный для SSL/HTTPS
     public RestTemplate restTemplate() {
         HttpClient httpClient = HttpClientBuilder.create()
-                .setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE) // 🔑 Отключаем проверку CN
+                .setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE)
                 .build();
 
         HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory(httpClient);
 
-        // 2. Установите таймауты, чтобы избежать бесконечного зависания
-        requestFactory.setConnectTimeout(15000); // Таймаут подключения (15 секунд)
-        requestFactory.setReadTimeout(15000);    // Таймаут чтения данных (15 секунд)
+        requestFactory.setConnectTimeout(15000);
+        requestFactory.setReadTimeout(15000);
 
         return new RestTemplate(requestFactory);
     }
