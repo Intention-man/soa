@@ -93,18 +93,18 @@ public class RouteProxyResource {
     private String buildGetRoutesSoapRequest(Integer page, Integer size, String[] sort, Map<String, String> filterParams) {
         StringBuilder sb = new StringBuilder();
         sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-        sb.append("<soap:Envelope xmlns:soap=\"http://www.w3.org/2003/05/soap-envelope\" xmlns:soap12=\"http://schemas.xmlsoap.org/wsdl/soap12/\">");
+        sb.append("<soap:Envelope xmlns:soap=\"http://www.w3.org/2003/05/soap-envelope\">");
         sb.append("<soap:Body>");
         sb.append("<getRoutes xmlns=\"http://routeservice.example.com/soap\">");
-        if (page != null) sb.append("<page>").append(page).append("</page>");
-        if (size != null) sb.append("<size>").append(size).append("</size>");
+        if (page != null) sb.append("<page xmlns=\"\">").append(page).append("</page>");
+        if (size != null) sb.append("<size xmlns=\"\">").append(size).append("</size>");
         if (sort != null) {
             for (String s : sort) {
-                sb.append("<sort>").append(s).append("</sort>");
+                sb.append("<sort xmlns=\"\">").append(s).append("</sort>");
             }
         }
-        if (filterParams != null) {
-            sb.append("<filterParams>");
+        if (filterParams != null && !filterParams.isEmpty()) {
+            sb.append("<filterParams xmlns=\"\">");
             for (Map.Entry<String, String> entry : filterParams.entrySet()) {
                 sb.append("<entry><key>").append(entry.getKey()).append("</key><value>").append(entry.getValue()).append("</value></entry>");
             }
@@ -116,18 +116,50 @@ public class RouteProxyResource {
         return sb.toString();
     }
 
+    private String extractSoapBodyContent(String soapResponse, String tagName) {
+        String startTag = "<" + tagName;
+        String endTag = "</" + tagName + ">";
+        int startIndex = soapResponse.indexOf(startTag);
+        if (startIndex == -1) {
+            startTag = "<ns2:" + tagName;
+            startIndex = soapResponse.indexOf(startTag);
+        }
+        if (startIndex == -1) {
+            startTag = "<ns3:" + tagName;
+            startIndex = soapResponse.indexOf(startTag);
+        }
+        int endIndex = soapResponse.indexOf(endTag, startIndex);
+        if (endIndex == -1) {
+            endTag = "</ns2:" + tagName + ">";
+            endIndex = soapResponse.indexOf(endTag, startIndex);
+        }
+        if (endIndex == -1) {
+            endTag = "</ns3:" + tagName + ">";
+            endIndex = soapResponse.indexOf(endTag, startIndex);
+        }
+
+        if (startIndex != -1 && endIndex != -1) {
+            int contentStart = soapResponse.indexOf(">", startIndex) + 1;
+            return soapResponse.substring(contentStart, endIndex).trim();
+        }
+        return null;
+    }
+
     private RouteListResponse parseGetRoutesResponse(String xml) {
         try {
-            jakarta.xml.bind.JAXBContext jaxbContext = jakarta.xml.bind.JAXBContext.newInstance(RouteListResponse.class);
-            jakarta.xml.bind.Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-            int startIdx = xml.indexOf("<routeListResponse");
-            int endIdx = xml.lastIndexOf("</routeListResponse>") + 20;
-            if (startIdx >= 0 && endIdx > startIdx) {
-                String responseXml = xml.substring(startIdx, endIdx);
-                return (RouteListResponse) unmarshaller.unmarshal(new java.io.StringReader(responseXml));
+            String content = extractSoapBodyContent(xml, "routeListResponse");
+            if (content == null || content.trim().isEmpty()) {
+                return new RouteListResponse();
             }
-            return new RouteListResponse();
+            content = content.replaceAll(" xmlns=\"[^\"]*\"", "")
+                           .replaceAll(" xmlns:ns\\d+=\"[^\"]*\"", "")
+                           .replaceAll(" xmlns:ns=\"[^\"]*\"", "");
+            String responseXml = "<RouteListResponse>" + content + "</RouteListResponse>";
+            jakarta.xml.bind.JAXBContext jaxbContext = jakarta.xml.bind.JAXBContext.newInstance(RouteListResponse.class, Route.class);
+            jakarta.xml.bind.Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+            return (RouteListResponse) unmarshaller.unmarshal(new java.io.StringReader(responseXml));
         } catch (Exception e) {
+            e.printStackTrace();
             throw new RuntimeException("Failed to parse SOAP response: " + e.getMessage(), e);
         }
     }
