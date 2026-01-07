@@ -4,92 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d7b595a3-8b27-441a-99b7-1afe05ad2a0e" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/navigator-service-spring-cloud/config-repo/navigator-service-spring.properties" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/navigator-service-spring-cloud/config-repo/zuul-gateway.properties" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/navigator-service-spring-cloud/config-server/pom.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/navigator-service-spring-cloud/config-server/src/main/java/com/example/configserver/ConfigServerApplication.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/navigator-service-spring-cloud/config-server/src/main/resources/application.properties" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/navigator-service-spring-cloud/navigator-service/src/main/java/com/example/navigator/NavigatorServiceSpringApplication.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/navigator-service-spring-cloud/navigator-service/src/main/java/com/example/navigator/config/CorsConfig.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/navigator-service-spring-cloud/navigator-service/src/main/java/com/example/navigator/resource/NavigatorController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/navigator-service-spring-cloud/navigator-service/src/main/resources/bootstrap.properties" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/navigator-service-spring-cloud/zuul-gateway/pom.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/navigator-service-spring-cloud/zuul-gateway/src/main/java/com/example/zuulgateway/ZuulConfiguration.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/navigator-service-spring-cloud/zuul-gateway/src/main/java/com/example/zuulgateway/ZuulGatewayApplication.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/navigator-service-spring-cloud/zuul-gateway/src/main/resources/bootstrap.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/encodings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
+    <list default="true" id="d7b595a3-8b27-441a-99b7-1afe05ad2a0e" name="Changes" comment="deleted comments">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build-deploy.sh" beforeDir="false" afterPath="$PROJECT_DIR$/build-deploy.sh" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/navigator-service/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/navigator-service-spring-cloud/navigator-service/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/navigator-service/src/main/java/com/example/navigator/config/CorsResponseFilter.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/navigator-service/src/main/java/com/example/navigator/config/NavigatorApplication.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/navigator-service/src/main/java/com/example/navigator/dto/Coordinates.java" beforeDir="false" afterPath="$PROJECT_DIR$/navigator-service-spring-cloud/navigator-service/src/main/java/com/example/navigator/dto/Coordinates.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/navigator-service/src/main/java/com/example/navigator/dto/FromLocation.java" beforeDir="false" afterPath="$PROJECT_DIR$/navigator-service-spring-cloud/navigator-service/src/main/java/com/example/navigator/dto/FromLocation.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/navigator-service/src/main/java/com/example/navigator/dto/Route.java" beforeDir="false" afterPath="$PROJECT_DIR$/navigator-service-spring-cloud/navigator-service/src/main/java/com/example/navigator/dto/Route.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/navigator-service/src/main/java/com/example/navigator/dto/RouteCreateRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/navigator-service-spring-cloud/navigator-service/src/main/java/com/example/navigator/dto/RouteCreateRequest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/navigator-service/src/main/java/com/example/navigator/dto/RouteListResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/navigator-service-spring-cloud/navigator-service/src/main/java/com/example/navigator/dto/RouteListResponse.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/navigator-service/src/main/java/com/example/navigator/dto/ToLocation.java" beforeDir="false" afterPath="$PROJECT_DIR$/navigator-service-spring-cloud/navigator-service/src/main/java/com/example/navigator/dto/ToLocation.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/navigator-service/src/main/java/com/example/navigator/resource/NavigatorResource.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/navigator-service/src/main/java/com/example/navigator/service/NavigatorService.java" beforeDir="false" afterPath="$PROJECT_DIR$/navigator-service-spring-cloud/navigator-service/src/main/java/com/example/navigator/service/NavigatorService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/navigator-service/src/main/resources/tests.sh" beforeDir="false" afterPath="$PROJECT_DIR$/navigator-service-spring-cloud/navigator-service/src/main/resources/tests.sh" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/navigator-service/src/main/webapp/WEB-INF/beans.xml" beforeDir="false" afterPath="$PROJECT_DIR$/route-service-javaee/route-management-service/route-ejb/src/main/resources/META-INF/beans.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/navigator-service/src/main/webapp/WEB-INF/web.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/route-ear/build-deploy.sh" beforeDir="false" afterPath="$PROJECT_DIR$/route-service-javaee/route-ear/build-deploy.sh" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/route-ear/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/route-service-javaee/route-ear/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/route-management-service/build-deploy.sh" beforeDir="false" afterPath="$PROJECT_DIR$/route-service-javaee/route-management-service/build-deploy.sh" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/route-management-service/init-db.sql" beforeDir="false" afterPath="$PROJECT_DIR$/route-service-javaee/route-management-service/init-db.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/route-management-service/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/route-service-javaee/route-management-service/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/route-management-service/route-common/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/route-service-javaee/route-management-service/route-common/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/route-management-service/route-common/src/main/java/com/example/routeservice/dto/DistanceGroupResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/route-service-javaee/route-management-service/route-common/src/main/java/com/example/routeservice/dto/DistanceGroupResponse.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/route-management-service/route-common/src/main/java/com/example/routeservice/dto/DistanceSumResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/route-service-javaee/route-management-service/route-common/src/main/java/com/example/routeservice/dto/DistanceSumResponse.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/route-management-service/route-common/src/main/java/com/example/routeservice/dto/ErrorResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/route-service-javaee/route-management-service/route-common/src/main/java/com/example/routeservice/dto/ErrorResponse.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/route-management-service/route-common/src/main/java/com/example/routeservice/dto/FilteredRoutesResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/route-service-javaee/route-management-service/route-common/src/main/java/com/example/routeservice/dto/FilteredRoutesResponse.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/route-management-service/route-common/src/main/java/com/example/routeservice/dto/RouteCreateRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/route-service-javaee/route-management-service/route-common/src/main/java/com/example/routeservice/dto/RouteCreateRequest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/route-management-service/route-common/src/main/java/com/example/routeservice/dto/RouteListResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/route-service-javaee/route-management-service/route-common/src/main/java/com/example/routeservice/dto/RouteListResponse.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/route-management-service/route-common/src/main/java/com/example/routeservice/dto/RouteUpdateRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/route-service-javaee/route-management-service/route-common/src/main/java/com/example/routeservice/dto/RouteUpdateRequest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/route-management-service/route-common/src/main/java/com/example/routeservice/entity/Coordinates.java" beforeDir="false" afterPath="$PROJECT_DIR$/route-service-javaee/route-management-service/route-common/src/main/java/com/example/routeservice/entity/Coordinates.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/route-management-service/route-common/src/main/java/com/example/routeservice/entity/FromLocation.java" beforeDir="false" afterPath="$PROJECT_DIR$/route-service-javaee/route-management-service/route-common/src/main/java/com/example/routeservice/entity/FromLocation.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/route-management-service/route-common/src/main/java/com/example/routeservice/entity/Route.java" beforeDir="false" afterPath="$PROJECT_DIR$/route-service-javaee/route-management-service/route-common/src/main/java/com/example/routeservice/entity/Route.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/route-management-service/route-common/src/main/java/com/example/routeservice/entity/ToLocation.java" beforeDir="false" afterPath="$PROJECT_DIR$/route-service-javaee/route-management-service/route-common/src/main/java/com/example/routeservice/entity/ToLocation.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/route-management-service/route-common/src/main/java/com/example/routeservice/exception/GlobalExceptionHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/route-service-javaee/route-management-service/route-common/src/main/java/com/example/routeservice/exception/GlobalExceptionHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/route-management-service/route-common/src/main/java/com/example/routeservice/exception/RouteNotFoundException.java" beforeDir="false" afterPath="$PROJECT_DIR$/route-service-javaee/route-management-service/route-common/src/main/java/com/example/routeservice/exception/RouteNotFoundException.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/route-management-service/route-common/src/main/java/com/example/routeservice/exception/ValidationException.java" beforeDir="false" afterPath="$PROJECT_DIR$/route-service-javaee/route-management-service/route-common/src/main/java/com/example/routeservice/exception/ValidationException.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/route-management-service/route-common/src/main/java/com/example/routeservice/filter/RouteFilter.java" beforeDir="false" afterPath="$PROJECT_DIR$/route-service-javaee/route-management-service/route-common/src/main/java/com/example/routeservice/filter/RouteFilter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/route-management-service/route-ejb/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/route-service-javaee/route-management-service/route-ejb/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/route-management-service/route-ejb/src/main/java/com/example/routeservice/config/DatabaseConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/route-service-javaee/route-management-service/route-ejb/src/main/java/com/example/routeservice/config/DatabaseConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/route-management-service/route-ejb/src/main/java/com/example/routeservice/repository/RouteRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/route-service-javaee/route-management-service/route-ejb/src/main/java/com/example/routeservice/repository/RouteRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/route-management-service/route-ejb/src/main/java/com/example/routeservice/repository/RouteRepositoryImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/route-service-javaee/route-management-service/route-ejb/src/main/java/com/example/routeservice/repository/RouteRepositoryImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/route-management-service/route-ejb/src/main/java/com/example/routeservice/service/RouteService.java" beforeDir="false" afterPath="$PROJECT_DIR$/route-service-javaee/route-management-service/route-ejb/src/main/java/com/example/routeservice/service/RouteService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/route-management-service/route-ejb/src/main/java/com/example/routeservice/service/RouteServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/route-service-javaee/route-management-service/route-ejb/src/main/java/com/example/routeservice/service/RouteServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/route-management-service/route-ejb/src/main/resources/META-INF/MANIFEST.MF" beforeDir="false" afterPath="$PROJECT_DIR$/route-service-javaee/route-management-service/route-ejb/src/main/resources/META-INF/MANIFEST.MF" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/route-management-service/route-ejb/src/main/resources/META-INF/beans.xml" beforeDir="false" afterPath="$PROJECT_DIR$/route-service-javaee/route-management-service/route-web/src/main/webapp/WEB-INF/beans.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/route-management-service/route-ejb/src/main/resources/META-INF/persistence.xml" beforeDir="false" afterPath="$PROJECT_DIR$/route-service-javaee/route-management-service/route-ejb/src/main/resources/META-INF/persistence.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/route-management-service/route-web/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/route-service-javaee/route-management-service/route-web/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/route-management-service/route-web/src/main/java/com/example/routeservice/config/ConsulRegistration.java" beforeDir="false" afterPath="$PROJECT_DIR$/route-service-javaee/route-management-service/route-web/src/main/java/com/example/routeservice/config/ConsulRegistration.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/route-management-service/route-web/src/main/java/com/example/routeservice/config/CorsResponseFilter.java" beforeDir="false" afterPath="$PROJECT_DIR$/route-service-javaee/route-management-service/route-web/src/main/java/com/example/routeservice/config/CorsResponseFilter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/route-management-service/route-web/src/main/java/com/example/routeservice/config/JAXRSConfiguration.java" beforeDir="false" afterPath="$PROJECT_DIR$/route-service-javaee/route-management-service/route-web/src/main/java/com/example/routeservice/config/JAXRSConfiguration.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/route-management-service/route-web/src/main/java/com/example/routeservice/resource/RouteResource.java" beforeDir="false" afterPath="$PROJECT_DIR$/route-service-javaee/route-management-service/route-web/src/main/java/com/example/routeservice/resource/RouteResource.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/route-management-service/route-web/src/main/webapp/WEB-INF/beans.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/route-management-service/route-web/src/main/webapp/WEB-INF/web.xml" beforeDir="false" afterPath="$PROJECT_DIR$/route-service-javaee/route-management-service/route-web/src/main/webapp/WEB-INF/web.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/route-management-service/test_find_routes.sh" beforeDir="false" afterPath="$PROJECT_DIR$/route-service-javaee/route-management-service/test_find_routes.sh" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/route-management-service/test_routes.sh" beforeDir="false" afterPath="$PROJECT_DIR$/route-service-javaee/route-management-service/test_routes.sh" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/first.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/swagger/first.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/second.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/swagger/second.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/swagger/favicon-16x16.png" beforeDir="false" afterPath="$PROJECT_DIR$/swagger/swagger/favicon-16x16.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/swagger/favicon-32x32.png" beforeDir="false" afterPath="$PROJECT_DIR$/swagger/swagger/favicon-32x32.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/swagger/index.css" beforeDir="false" afterPath="$PROJECT_DIR$/swagger/swagger/index.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/swagger/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/swagger/swagger/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/swagger/oauth2-redirect.html" beforeDir="false" afterPath="$PROJECT_DIR$/swagger/swagger/oauth2-redirect.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/swagger/swagger-initializer.js" beforeDir="false" afterPath="$PROJECT_DIR$/swagger/swagger/swagger-initializer.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/swagger/swagger-ui-bundle.js" beforeDir="false" afterPath="$PROJECT_DIR$/swagger/swagger/swagger-ui-bundle.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/swagger/swagger-ui-es-bundle-core.js" beforeDir="false" afterPath="$PROJECT_DIR$/swagger/swagger/swagger-ui-es-bundle-core.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/swagger/swagger-ui-es-bundle.js" beforeDir="false" afterPath="$PROJECT_DIR$/swagger/swagger/swagger-ui-es-bundle.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/swagger/swagger-ui-standalone-preset.js" beforeDir="false" afterPath="$PROJECT_DIR$/swagger/swagger/swagger-ui-standalone-preset.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/swagger/swagger-ui.css" beforeDir="false" afterPath="$PROJECT_DIR$/swagger/swagger/swagger-ui.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/swagger/swagger-ui.js" beforeDir="false" afterPath="$PROJECT_DIR$/swagger/swagger/swagger-ui.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/swagger/task.txt" beforeDir="false" afterPath="$PROJECT_DIR$/swagger/swagger/task.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -106,7 +22,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="lab2" />
+        <entry key="$PROJECT_DIR$" value="lab3" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -143,7 +59,7 @@
     &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;lab3&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;lab4&quot;,
     &quot;last_opened_file_path&quot;: &quot;/Users/mihailagei/Documents/ITMO/7_term/soa/route-ear&quot;,
     &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
     &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
@@ -182,11 +98,20 @@
       <option name="presentableId" value="Default" />
       <updated>1760002015911</updated>
     </task>
+    <task id="LOCAL-00001" summary="deleted comments">
+      <option name="closed" value="true" />
+      <created>1764086088885</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1764086088885</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TerminalProjectNonSharedOptionsProvider">
     <envs>
-      <env key="GSID" value="IDE:idea:eea378634a794deb8827a4b94b463533 IDETERM:idea:eea378634a794deb8827a4b94b463533" />
+      <env key="GSID" value="IDE:idea:f44d4a24f525462a9dffa686ca05b1a6 IDETERM:idea:f44d4a24f525462a9dffa686ca05b1a6" />
     </envs>
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -199,6 +124,10 @@
         </entry>
       </map>
     </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="deleted comments" />
+    <option name="LAST_COMMIT_MESSAGE" value="deleted comments" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

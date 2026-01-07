@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:soap="http://www.mulesoft.org/schema/mule/soap"
+      xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+      http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+      http://www.mulesoft.org/schema/mule/soap http://www.mulesoft.org/schema/mule/soap/current/mule-soap.xsd
+      http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+
+    <http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config">
+        <http:listener-connection host="0.0.0.0" port="8081" />
+    </http:listener-config>
+
+    <soap:ws-consumer-config name="RouteSoapService_Config" 
+                              wsdlLocation="http://localhost:38443/route-web/RouteSoapService?wsdl"
+                              service="RouteSoapService"
+                              port="RouteSoapServicePort"
+                              doc:name="SOAP Web Service Consumer">
+        <soap:ws-security>
+            <soap:ws-config>
+                <soap:property key="action" value="UsernameToken" />
+            </soap:ws-config>
+        </soap:ws-security>
+    </soap:ws-consumer-config>
+
+    <flow name="route-service-integration" doc:name="route-service-integration">
+        <http:listener doc:name="HTTP Listener" 
+                       config-ref="HTTP_Listener_config" 
+                       path="/routes/*"/>
+        
+        <ee:transform doc:name="Transform REST to SOAP">
+            <ee:message>
+                <ee:set-payload><![CDATA[
+                    %dw 2.0
+                    output application/xml
+                    ---
+                    {
+                        routeListResponse: {
+                            routes: payload.routes,
+                            totalElements: payload.totalElements,
+                            totalPages: payload.totalPages,
+                            currentPage: payload.currentPage,
+                            pageSize: payload.pageSize
+                        }
+                    }
+                ]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+
+        <soap:consume doc:name="Call SOAP Service" 
+                      config-ref="RouteSoapService_Config" 
+                      operation="getRoutes"/>
+        
+        <ee:transform doc:name="Transform SOAP to REST">
+            <ee:message>
+                <ee:set-payload><![CDATA[
+                    %dw 2.0
+                    output application/xml
+                    ---
+                    payload.routeListResponse
+                ]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+
+    <flow name="navigator-to-route-proxy" doc:name="navigator-to-route-proxy">
+        <http:listener doc:name="HTTP Listener" 
+                       config-ref="HTTP_Listener_config" 
+                       path="/proxy/routes/*"/>
+        
+        <logger level="INFO" doc:name="Logger" message="Proxying request from Navigator Service"/>
+        
+        <http:request method="GET" 
+                      doc:name="HTTP Request" 
+                      config-ref="HTTP_Request_configuration" 
+                      path="/api/routes/{idFrom}/{idTo}/{orderBy}">
+            <http:uri-params>
+                <http:uri-param key="idFrom" value="#[attributes.uriParams.idFrom]"/>
+                <http:uri-param key="idTo" value="#[attributes.uriParams.idTo]"/>
+                <http:uri-param key="orderBy" value="#[attributes.uriParams.orderBy]"/>
+            </http:uri-params>
+        </http:request>
+    </flow>
+
+    <http:request-config name="HTTP_Request_configuration" 
+                         doc:name="HTTP Request Configuration">
+        <http:request-connection host="localhost" port="38443" />
+    </http:request-config>
+
+</mule>
+

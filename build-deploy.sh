@@ -1,5 +1,5 @@
 mvn clean install
-#scp -r -P 2222 route-service-javaee/route-ear/target/route-ear-1.0-SNAPSHOT.ear s367044@helios.cs.ifmo.ru:~/wildfly/wildfly-35.0.0.Final/standalone/deployments/
+scp -r -P 2222 route-service-javaee/route-ear/target/route-ear-1.0-SNAPSHOT.ear s367044@helios.cs.ifmo.ru:~/wildfly/wildfly-35.0.0.Final/standalone/deployments/
 
 cd navigator-service-spring-cloud
 scp -r -P 2222 \
