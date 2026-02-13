@@ -24,8 +24,6 @@
         <module>route-service-javaee/route-ear</module>
 
         <module>navigator-service-spring-cloud/config-server</module>
-<!--        <module>navigator-service-spring-cloud/eureka-server</module>-->
-        <module>navigator-service-spring-cloud/zuul-gateway</module>
         <module>navigator-service-spring-cloud/navigator-service</module>
     </modules>
 

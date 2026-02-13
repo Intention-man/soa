@@ -5,6 +5,5 @@ cd navigator-service-spring-cloud
 scp -r -P 2222 \
 config-repo \
 config-server/target/config-server-1.0-SNAPSHOT.jar \
-zuul-gateway/target/zuul-gateway-1.0-SNAPSHOT.jar \
 navigator-service/target/navigator-service-spring-1.0-SNAPSHOT.jar \
 s367785@helios.cs.ifmo.ru:~/services/navigator-services-dir

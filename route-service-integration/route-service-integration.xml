@@ -1,0 +1,399 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+      http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+      http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+      http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd">
+
+    <!-- Global Configuration -->
+    <http:listener-config name="HTTP_Listener_config">
+        <http:listener-connection host="0.0.0.0" port="8092" />
+        <http:listener-interceptors>
+            <http:cors-interceptor>
+                <http:origins>
+                    <http:origin url="*" accessControlMaxAge="86400">
+                        <http:allowed-methods>
+                            <http:method methodName="GET"/>
+                            <http:method methodName="POST"/>
+                            <http:method methodName="PUT"/>
+                            <http:method methodName="DELETE"/>
+                            <http:method methodName="OPTIONS"/>
+                        </http:allowed-methods>
+                        <http:allowed-headers>
+                            <http:header headerName="*"/>
+                        </http:allowed-headers>
+                        <http:expose-headers>
+                            <http:header headerName="*"/>
+                        </http:expose-headers>
+                    </http:origin>
+                </http:origins>
+            </http:cors-interceptor>
+        </http:listener-interceptors>
+    </http:listener-config>
+
+    <tls:context name="Insecure_TLS_Context">
+        <tls:trust-store insecure="true" />
+    </tls:context>
+
+    <http:request-config name="RouteService_Https_Request_Config">
+        <http:request-connection protocol="HTTPS" host="localhost" port="38443" tlsContext="Insecure_TLS_Context"/>
+    </http:request-config>
+
+    <!-- 1. GET /routes (With filtering, sorting, paging) -->
+    <flow name="get-routes">
+        <http:listener config-ref="HTTP_Listener_config" path="/route-management-service/routes" allowedMethods="GET"/>
+
+        <logger level="INFO" message="REST -> SOAP: getRoutes params=#[attributes.queryParams]"/>
+
+        <ee:transform doc:name="Transform to SOAP">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/java
+var sortParams = attributes.queryParams.*sort default []
+var filterEntries = (attributes.queryParams pluck ((value, key) -> {k: key, v: value})) filter ($.k startsWith "filter.")
+var pageXml = if (attributes.queryParams.page != null) "<page xmlns=\"\">" ++ attributes.queryParams.page ++ "</page>" else ""
+var sizeXml = if (attributes.queryParams.size != null) "<size xmlns=\"\">" ++ attributes.queryParams.size ++ "</size>" else ""
+var sortXml = (sortParams map (item) -> "<sort xmlns=\"\">" ++ item ++ "</sort>") joinBy ""
+var filterXml = if (filterEntries != []) "<filterParams xmlns=\"\">" ++ ((filterEntries map (entry) -> "<entry><key>" ++ entry.k ++ "</key><value>" ++ entry.v ++ "</value></entry>") joinBy "") ++ "</filterParams>" else ""
+---
+"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" ++
+"<soap:Envelope xmlns:soap=\"http://www.w3.org/2003/05/soap-envelope\">" ++
+"<soap:Body>" ++
+"<getRoutes xmlns=\"http://routeservice.example.com/soap\">" ++
+pageXml ++ sizeXml ++ sortXml ++ filterXml ++
+"</getRoutes>" ++
+"</soap:Body></soap:Envelope>"]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+
+        <http:request method="POST" config-ref="RouteService_Https_Request_Config" path="/route-web/RouteSoapService">
+             <http:headers><![CDATA[#[{'Content-Type': 'application/soap+xml'}]]]></http:headers>
+        </http:request>
+
+        <ee:transform doc:name="Transform to XML">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/xml
+var content = (payload..routeListResponse default [])[0]
+---
+{
+    RouteListResponse: (content default {})
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+
+    <!-- 2. POST /routes (Create Route) -->
+    <flow name="create-route">
+        <http:listener config-ref="HTTP_Listener_config" path="/route-management-service/routes" allowedMethods="POST"/>
+
+        <logger level="INFO" message="REST -> SOAP: createRoute payload=#[payload]"/>
+
+        <ee:transform doc:name="Transform to SOAP">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/java
+var req = payload.RouteCreateRequest default payload
+var fromLoc = req.fromLocation default null
+var toLoc = req.toLocation default null
+var fromXml = "<fromLocation>" ++
+    (if (fromLoc.id != null) "<id>" ++ fromLoc.id ++ "</id>" else "") ++
+    (if (fromLoc.name != null) "<name>" ++ fromLoc.name ++ "</name>" else "") ++
+    (if (fromLoc.x != null) "<x>" ++ fromLoc.x ++ "</x>" else "") ++
+    (if (fromLoc.y != null) "<y>" ++ fromLoc.y ++ "</y>" else "") ++
+    "</fromLocation>"
+var toXml = if (toLoc != null) "<toLocation>" ++
+    (if (toLoc.id != null) "<id>" ++ toLoc.id ++ "</id>" else "") ++
+    (if (toLoc.name != null) "<name>" ++ toLoc.name ++ "</name>" else "") ++
+    (if (toLoc.x != null) "<x>" ++ toLoc.x ++ "</x>" else "") ++
+    (if (toLoc.y != null) "<y>" ++ toLoc.y ++ "</y>" else "") ++
+    "</toLocation>" else ""
+---
+"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" ++
+"<soap:Envelope xmlns:soap=\"http://www.w3.org/2003/05/soap-envelope\">" ++
+"<soap:Body><createRoute xmlns=\"http://routeservice.example.com/soap\">" ++
+"<request xmlns=\"\">" ++
+"<name>" ++ req.name ++ "</name>" ++
+"<coordinates><x>" ++ req.coordinates.x ++ "</x><y>" ++ req.coordinates.y ++ "</y></coordinates>" ++
+fromXml ++ toXml ++
+"<distance>" ++ req.distance ++ "</distance>" ++
+"</request></createRoute></soap:Body></soap:Envelope>"]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+
+        <http:request method="POST" config-ref="RouteService_Https_Request_Config" path="/route-web/RouteSoapService">
+             <http:headers><![CDATA[#[{'Content-Type': 'application/soap+xml'}]]]></http:headers>
+        </http:request>
+
+        <ee:transform doc:name="Transform to XML">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/xml
+var route = (payload..route default [])[0]
+---
+{
+    route: (route default {})
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+
+    <!-- 3. GET /routes/{id} -->
+    <flow name="get-route-by-id">
+        <http:listener config-ref="HTTP_Listener_config" path="/route-management-service/routes/{id}" allowedMethods="GET"/>
+
+        <ee:transform doc:name="Transform to SOAP">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" ++
+"<soap:Envelope xmlns:soap=\"http://www.w3.org/2003/05/soap-envelope\">" ++
+"<soap:Body><getRouteById xmlns=\"http://routeservice.example.com/soap\">" ++
+"<id xmlns=\"\">" ++ attributes.uriParams.id ++ "</id>" ++
+"</getRouteById></soap:Body></soap:Envelope>"]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+
+        <http:request method="POST" config-ref="RouteService_Https_Request_Config" path="/route-web/RouteSoapService">
+             <http:headers><![CDATA[#[{'Content-Type': 'application/soap+xml'}]]]></http:headers>
+        </http:request>
+
+        <ee:transform doc:name="Transform to XML">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/xml
+var route = (payload..route default [])[0]
+---
+{
+    route: (route default {})
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+
+    <!-- 4. PUT /routes/{id} -->
+    <flow name="update-route">
+        <http:listener config-ref="HTTP_Listener_config" path="/route-management-service/routes/{id}" allowedMethods="PUT"/>
+
+        <ee:transform doc:name="Transform to SOAP">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/java
+var req = payload.RouteUpdateRequest default payload
+var fromLoc = req.fromLocation default {}
+var toLoc = req.toLocation default null
+var coords = req.coordinates default {}
+var fromXml = if (fromLoc != null and fromLoc != {}) ("<fromLocation>" ++
+    (if (fromLoc.id != null) "<id>" ++ (fromLoc.id as String) ++ "</id>" else "") ++
+    (if (fromLoc.name != null) "<name>" ++ (fromLoc.name as String) ++ "</name>" else "") ++
+    (if (fromLoc.x != null) "<x>" ++ (fromLoc.x as String) ++ "</x>" else "") ++
+    (if (fromLoc.y != null) "<y>" ++ (fromLoc.y as String) ++ "</y>" else "") ++
+    "</fromLocation>") else ""
+var toXml = if (toLoc != null and toLoc != {}) ("<toLocation>" ++
+    (if (toLoc.id != null) "<id>" ++ (toLoc.id as String) ++ "</id>" else "") ++
+    (if (toLoc.name != null) "<name>" ++ (toLoc.name as String) ++ "</name>" else "") ++
+    (if (toLoc.x != null) "<x>" ++ (toLoc.x as String) ++ "</x>" else "") ++
+    (if (toLoc.y != null) "<y>" ++ (toLoc.y as String) ++ "</y>" else "") ++
+    "</toLocation>") else ""
+var coordsXml = if (coords != null and coords != {}) ("<coordinates>" ++
+    (if (coords.x != null) "<x>" ++ (coords.x as String) ++ "</x>" else "") ++
+    (if (coords.y != null) "<y>" ++ (coords.y as String) ++ "</y>" else "") ++
+    "</coordinates>") else ""
+---
+"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" ++
+"<soap:Envelope xmlns:soap=\"http://www.w3.org/2003/05/soap-envelope\">" ++
+"<soap:Body><updateRoute xmlns=\"http://routeservice.example.com/soap\">" ++
+"<id xmlns=\"\">" ++ attributes.uriParams.id ++ "</id>" ++
+"<request xmlns=\"\">" ++
+(if (req.name != null) "<name>" ++ (req.name as String) ++ "</name>" else "") ++
+coordsXml ++
+fromXml ++ toXml ++
+(if (req.distance != null) "<distance>" ++ (req.distance as String) ++ "</distance>" else "") ++
+"</request></updateRoute></soap:Body></soap:Envelope>"]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+
+        <http:request method="POST" config-ref="RouteService_Https_Request_Config" path="/route-web/RouteSoapService">
+             <http:headers><![CDATA[#[{'Content-Type': 'application/soap+xml'}]]]></http:headers>
+        </http:request>
+
+        <ee:transform doc:name="Transform to XML">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/xml
+var route = (payload..route default [])[0]
+---
+{
+    route: (route default {})
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+
+    <!-- 5. DELETE /routes/{id} -->
+    <flow name="delete-route">
+        <http:listener config-ref="HTTP_Listener_config" path="/route-management-service/routes/{id}" allowedMethods="DELETE"/>
+
+        <ee:transform doc:name="Transform to SOAP">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" ++
+"<soap:Envelope xmlns:soap=\"http://www.w3.org/2003/05/soap-envelope\">" ++
+"<soap:Body><deleteRoute xmlns=\"http://routeservice.example.com/soap\">" ++
+"<id xmlns=\"\">" ++ attributes.uriParams.id ++ "</id>" ++
+"</deleteRoute></soap:Body></soap:Envelope>"]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+
+        <http:request method="POST" config-ref="RouteService_Https_Request_Config" path="/route-web/RouteSoapService">
+             <http:headers><![CDATA[#[{'Content-Type': 'application/soap+xml'}]]]></http:headers>
+        </http:request>
+
+        <set-payload value="#[null]"/>
+    </flow>
+
+    <!-- 6. GET /routes/distance/sum -->
+    <flow name="get-distance-sum">
+        <http:listener config-ref="HTTP_Listener_config" path="/route-management-service/routes/distance/sum" allowedMethods="GET"/>
+
+        <ee:transform doc:name="Transform to SOAP">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" ++
+"<soap:Envelope xmlns:soap=\"http://www.w3.org/2003/05/soap-envelope\">" ++
+"<soap:Body><getDistanceSum xmlns=\"http://routeservice.example.com/soap\"/></soap:Body></soap:Envelope>"]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+
+        <http:request method="POST" config-ref="RouteService_Https_Request_Config" path="/route-web/RouteSoapService">
+             <http:headers><![CDATA[#[{'Content-Type': 'application/soap+xml'}]]]></http:headers>
+        </http:request>
+
+        <ee:transform doc:name="Transform to XML">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/xml
+var content = (payload..distanceSumResponse default [])[0]
+---
+{
+    DistanceSumResponse: (content default {})
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+
+    <!-- 7. GET /routes/distance/group -->
+    <flow name="group-by-distance">
+        <http:listener config-ref="HTTP_Listener_config" path="/route-management-service/routes/distance/group" allowedMethods="GET"/>
+
+        <ee:transform doc:name="Transform to SOAP">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" ++
+"<soap:Envelope xmlns:soap=\"http://www.w3.org/2003/05/soap-envelope\">" ++
+"<soap:Body><groupByDistance xmlns=\"http://routeservice.example.com/soap\"/></soap:Body></soap:Envelope>"]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+
+        <http:request method="POST" config-ref="RouteService_Https_Request_Config" path="/route-web/RouteSoapService">
+             <http:headers><![CDATA[#[{'Content-Type': 'application/soap+xml'}]]]></http:headers>
+        </http:request>
+
+        <ee:transform doc:name="Transform to XML">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/xml
+var content = (payload..distanceGroupResponse default [])[0]
+---
+{
+    DistanceGroupResponse: (content default {})
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+
+    <!-- 8. GET /routes/distance/greater-than -->
+    <flow name="get-routes-distance-greater-than">
+        <http:listener config-ref="HTTP_Listener_config" path="/route-management-service/routes/distance/greater-than" allowedMethods="GET"/>
+
+        <ee:transform doc:name="Transform to SOAP">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" ++
+"<soap:Envelope xmlns:soap=\"http://www.w3.org/2003/05/soap-envelope\">" ++
+"<soap:Body><getRoutesWithDistanceGreaterThan xmlns=\"http://routeservice.example.com/soap\">" ++
+"<minDistance xmlns=\"\">" ++ attributes.queryParams.minDistance ++ "</minDistance>" ++
+"</getRoutesWithDistanceGreaterThan></soap:Body></soap:Envelope>"]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+
+        <http:request method="POST" config-ref="RouteService_Https_Request_Config" path="/route-web/RouteSoapService">
+             <http:headers><![CDATA[#[{'Content-Type': 'application/soap+xml'}]]]></http:headers>
+        </http:request>
+
+        <ee:transform doc:name="Transform to XML">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/xml
+var content = (payload..filteredRoutesResponse default [])[0]
+---
+{
+    FilteredRoutesResponse: (content default {})
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+
+    <!-- 9. POST /routes/add/{idFrom}/{idTo}/{distance} -->
+    <flow name="create-route-between-locations">
+        <http:listener config-ref="HTTP_Listener_config" path="/route-management-service/routes/add/{idFrom}/{idTo}/{distance}" allowedMethods="POST"/>
+
+        <logger level="INFO" message="REST -> SOAP: createRouteBetweenLocations idFrom=#[attributes.uriParams.idFrom] idTo=#[attributes.uriParams.idTo] distance=#[attributes.uriParams.distance]"/>
+
+        <ee:transform doc:name="Transform to SOAP">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" ++
+"<soap:Envelope xmlns:soap=\"http://www.w3.org/2003/05/soap-envelope\">" ++
+"<soap:Body><createRouteBetweenLocations xmlns=\"http://routeservice.example.com/soap\">" ++
+"<idFrom xmlns=\"\">" ++ attributes.uriParams.idFrom ++ "</idFrom>" ++
+"<idTo xmlns=\"\">" ++ attributes.uriParams.idTo ++ "</idTo>" ++
+"<distance xmlns=\"\">" ++ attributes.uriParams.distance ++ "</distance>" ++
+"</createRouteBetweenLocations></soap:Body></soap:Envelope>"]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+
+        <http:request method="POST" config-ref="RouteService_Https_Request_Config" path="/route-web/RouteSoapService">
+             <http:headers><![CDATA[#[{'Content-Type': 'application/soap+xml'}]]]></http:headers>
+        </http:request>
+
+        <ee:transform doc:name="Transform to XML">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/xml
+var route = (payload..route default [])[0]
+---
+{
+    route: (route default {})
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+
+</mule>

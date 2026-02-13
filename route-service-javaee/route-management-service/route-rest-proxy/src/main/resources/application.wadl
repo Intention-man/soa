@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<application xmlns="http://wadl.dev.java.net/2009/02">
+    <resources base="https://localhost:38443/route-management-service">
+        <resource path="/routes">
+            <method name="GET"/>
+            <method name="POST"/>
+            <resource path="{id}">
+                <param name="id" type="xs:long" style="template"/>
+                <method name="GET"/>
+                <method name="PUT"/>
+                <method name="DELETE"/>
+            </resource>
+            <resource path="distance/sum">
+                <method name="GET"/>
+            </resource>
+            <resource path="distance/group">
+                <method name="GET"/>
+            </resource>
+            <resource path="distance/greater-than">
+                <method name="GET"/>
+            </resource>
+            <resource path="add/{idFrom}/{idTo}/{distance}">
+                <param name="idFrom" type="xs:long" style="template"/>
+                <param name="idTo" type="xs:long" style="template"/>
+                <param name="distance" type="xs:double" style="template"/>
+                <method name="POST"/>
+            </resource>
+        </resource>
+    </resources>
+</application>

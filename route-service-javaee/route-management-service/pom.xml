@@ -12,6 +12,7 @@
         <module>route-common</module>
         <module>route-ejb</module>
         <module>route-web</module>
+        <module>route-rest-proxy</module>
     </modules>
 
     <properties>

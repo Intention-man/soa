@@ -112,8 +112,6 @@ public class RouteResource {
     }
 
 
-    // FOR PROXY SERVICE
-
 
     @POST
     @Path("/add/{idFrom}/{idTo}/{distance}")
